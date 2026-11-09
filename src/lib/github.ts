@@ -1,3 +1,4 @@
+import { after } from "next/server";
 import { kv } from "./kv";
 
 export const PROJECT_REPO = "kalk-ak/internship-radar";
@@ -13,7 +14,7 @@ export interface RepoStats {
   topics: string[];
   pushedAt: string;
   languages: { name: string; percent: number }[];
-  lastCommit: { sha: string; message: string; author: string; date: string } | null;
+  lastCommit: { sha: string; message: string; author: string; avatarUrl: string | null; date: string } | null;
 }
 
 const FRESH_MS = 10 * 60 * 1000;
@@ -26,7 +27,7 @@ async function gh<T>(path: string): Promise<T> {
   };
   // Optional: a token with no scopes lifts the 60 requests/hour anonymous limit.
   if (process.env.GITHUB_TOKEN) headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
-  const res = await fetch(`https://api.github.com${path}`, { headers, cache: "no-store", signal: AbortSignal.timeout(5000) });
+  const res = await fetch(`https://api.github.com${path}`, { headers, cache: "no-store", signal: AbortSignal.timeout(4000) });
   if (!res.ok) throw new Error(`GitHub ${path} ${res.status}`);
   return (await res.json()) as T;
 }
@@ -48,7 +49,7 @@ async function fetchStats(repo: string, detailed: boolean): Promise<RepoStats> {
   if (detailed) {
     const [langs, commits] = await Promise.all([
       gh<Record<string, number>>(`/repos/${repo}/languages`).catch(() => ({})),
-      gh<{ sha: string; commit: { message: string; author: { name: string; date: string } }; author: { login: string } | null }[]>(
+      gh<{ sha: string; commit: { message: string; author: { name: string; date: string } }; author: { login: string; avatar_url: string } | null }[]>(
         `/repos/${repo}/commits?per_page=1`,
       ).catch(() => []),
     ]);
@@ -62,6 +63,7 @@ async function fetchStats(repo: string, detailed: boolean): Promise<RepoStats> {
         sha: c.sha,
         message: c.commit.message.split("\n")[0],
         author: c.author?.login ?? c.commit.author.name,
+        avatarUrl: c.author?.avatar_url ?? null,
         date: c.commit.author.date,
       };
     }
@@ -82,22 +84,35 @@ async function fetchStats(repo: string, detailed: boolean): Promise<RepoStats> {
   };
 }
 
-/**
- * Repo stats cached in Redis for 10 minutes. On GitHub errors (including rate
- * limits) the last good value is served, however old.
- */
-export async function repoStats(repo = PROJECT_REPO, detailed = true): Promise<RepoStats | null> {
-  const key = `gh:repo:${repo}:${detailed ? "full" : "basic"}`;
-  const cached = await kv().get<{ at: number; stats: RepoStats }>(key);
-  if (cached && Date.now() - cached.at < FRESH_MS) return cached.stats;
+async function refresh(repo: string, detailed: boolean, key: string) {
   try {
     const stats = await fetchStats(repo, detailed);
     await kv().set(key, { at: Date.now(), stats });
     return stats;
   } catch (err) {
     console.error("GitHub stats unavailable", err);
-    return cached?.stats ?? null;
+    return null;
   }
+}
+
+/**
+ * Repo stats, stale-while-revalidate: a cached value is returned immediately
+ * and refreshed in the background once it's 10 minutes old, so a slow or
+ * rate-limited GitHub API never delays a page. Only the very first request
+ * waits on GitHub.
+ */
+export async function repoStats(repo = PROJECT_REPO, detailed = true): Promise<RepoStats | null> {
+  const key = `gh:repo:${repo}:${detailed ? "full" : "basic"}`;
+  const cached = await kv().get<{ at: number; stats: RepoStats }>(key);
+  if (!cached) return refresh(repo, detailed, key);
+  if (Date.now() - cached.at > FRESH_MS && (await kv().set(`${key}:refreshing`, 1, { ex: 60, nx: true }))) {
+    try {
+      after(() => refresh(repo, detailed, key));
+    } catch {
+      await refresh(repo, detailed, key); // outside a request (scripts, tests)
+    }
+  }
+  return cached.stats;
 }
 
 export function compactNumber(n: number) {

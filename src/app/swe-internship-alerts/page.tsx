@@ -165,7 +165,13 @@ async function LatestCommit() {
       {c ? (
         <>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={`https://github.com/${c.author}.png?size=40`} alt="" width={20} height={20} className="h-5 w-5 shrink-0 rounded-full" />
+          <img
+            src={c.avatarUrl ? `${c.avatarUrl}${c.avatarUrl.includes("?") ? "&" : "?"}s=40` : `https://avatars.githubusercontent.com/${c.author}?s=40`}
+            alt=""
+            width={20}
+            height={20}
+            className="h-5 w-5 shrink-0 rounded-full bg-gh-subtle"
+          />
           <a href={`https://github.com/${c.author}`} className="shrink-0 font-semibold hover:text-gh-accent hover:underline">
             {c.author}
           </a>

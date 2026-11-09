@@ -1,4 +1,5 @@
 import type { RawListing } from "./types";
+import { pacificDay as dayKey } from "./heat";
 import { toRole } from "./simplify";
 
 /** Daily posting counts, bucketed in Pacific time like the SimplifyJobs README. */
@@ -10,16 +11,7 @@ export interface Activity {
 
 export const ACTIVITY_DAYS = 53 * 7;
 
-const pacificDate = new Intl.DateTimeFormat("en-CA", {
-  timeZone: "America/Los_Angeles",
-  year: "numeric",
-  month: "2-digit",
-  day: "2-digit",
-});
-
-export function dayKey(ms: number) {
-  return pacificDate.format(ms);
-}
+export { pacificDay as dayKey } from "./heat";
 
 export function buildActivity(listings: RawListing[], isHot: (company: string) => boolean, now = Date.now()): Activity {
   const counts = new Map<string, [number, number]>();

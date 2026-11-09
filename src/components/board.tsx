@@ -106,7 +106,7 @@ export function Board({ initial, initialQuery }: Props) {
       </div>
 
       <p className="mt-4 text-sm text-muted" aria-live="polite">
-        {loading ? "Loading roles…" : `${data.total.toLocaleString()} ${data.total === 1 ? "role" : "roles"}`}
+        {loading ? "Loading roles…" : `${data.total.toLocaleString("en-US")} ${data.total === 1 ? "role" : "roles"}`}
       </p>
 
       {groups.length === 0 && !loading ? (
