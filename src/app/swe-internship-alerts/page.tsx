@@ -53,8 +53,15 @@ export const metadata: Metadata = {
     "open source",
   ],
   alternates: { canonical: DEV_PAGE_PATH },
-  openGraph: { type: "website", url: DEV_PAGE_PATH, title: `${DEV_PAGE_TITLE} | Internship Radar`, description: DEV_PAGE_DESCRIPTION },
-  twitter: { card: "summary_large_image", title: DEV_PAGE_TITLE, description: DEV_PAGE_DESCRIPTION },
+  // Setting openGraph here replaces the inherited object, so the image is listed explicitly.
+  openGraph: {
+    type: "website",
+    url: DEV_PAGE_PATH,
+    title: `${DEV_PAGE_TITLE} | Internship Radar`,
+    description: DEV_PAGE_DESCRIPTION,
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: DEV_PAGE_TITLE }],
+  },
+  twitter: { card: "summary_large_image", title: DEV_PAGE_TITLE, description: DEV_PAGE_DESCRIPTION, images: ["/opengraph-image"] },
 };
 
 const TABS = [
