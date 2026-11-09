@@ -6,6 +6,8 @@ Internship Radar watches the [SimplifyJobs](https://github.com/SimplifyJobs) int
 
 It runs entirely on free tiers: Vercel Hobby, Upstash Redis free, and GitHub Actions.
 
+**Live:** <https://internship-radar-xi.vercel.app>
+
 ![Internship Radar landing page](docs/screenshot.png)
 
 ## Features
