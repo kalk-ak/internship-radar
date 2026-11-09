@@ -29,7 +29,7 @@ const CATEGORY_TEXT: Record<Category, string> = {
 };
 
 const inputClass =
-  "w-full rounded-lg border border-rule bg-panel px-3.5 py-2.5 text-[0.95rem] placeholder:text-muted/80 focus:border-ink focus:outline-none";
+  "w-full rounded-lg border border-rule-strong bg-paper px-3.5 py-2.5 text-[0.95rem] text-ink focus:border-accent focus:outline-none";
 
 function Icon({ name }: { name: "email" | "telegram" | "discord" | "whatsapp" }) {
   const paths = {
@@ -64,14 +64,14 @@ function ChannelRow({
 }) {
   const [on, setOn] = useState(defaultOn);
   return (
-    <div className={`rounded-xl border transition-colors ${on ? "border-ink bg-panel" : "border-rule bg-panel/60"}`}>
+    <div className={`rounded-xl border transition-colors ${on ? "border-accent/50 bg-wash" : "border-rule bg-paper/40 hover:border-rule-strong"}`}>
       <label className="flex cursor-pointer items-start gap-3 p-4">
         <input
           type="checkbox"
           name={`use_${id}`}
           checked={on}
           onChange={(e) => setOn(e.target.checked)}
-          className="mt-0.5 h-5 w-5 shrink-0 accent-ink"
+          className="mt-0.5 h-5 w-5 shrink-0 accent-[var(--color-accent)]"
         />
         <span className="flex min-w-0 flex-1 flex-col">
           <span className="flex items-center gap-2 font-semibold">
@@ -204,14 +204,14 @@ export function SubscriptionFields({
         <p className="mb-3 text-sm text-muted">Software includes roles with software titles in other categories, like ML infrastructure.</p>
         <div className="grid gap-2 sm:grid-cols-2">
           {CATEGORIES.map((c) => (
-            <label key={c} className="flex cursor-pointer items-center gap-2.5 rounded-lg border border-rule bg-panel px-3.5 py-2.5 text-[0.95rem] has-[:checked]:border-ink">
-              <input type="checkbox" name="categories" value={c} defaultChecked={prefs.categories.includes(c)} className="h-4 w-4 accent-ink" />
+            <label key={c} className="flex cursor-pointer items-center gap-2.5 rounded-lg border border-rule bg-paper/40 px-3.5 py-2.5 text-[0.95rem] has-[:checked]:border-accent/50 has-[:checked]:bg-wash">
+              <input type="checkbox" name="categories" value={c} defaultChecked={prefs.categories.includes(c)} className="h-4 w-4 accent-[var(--color-accent)]" />
               {CATEGORY_TEXT[c]}
             </label>
           ))}
         </div>
-        <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-lg border border-rule bg-panel px-3.5 py-3 has-[:checked]:border-hot">
-          <input type="checkbox" name="hotOnly" defaultChecked={prefs.hotOnly} className="mt-1 h-4 w-4 accent-[var(--color-hot)]" />
+        <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-lg border border-rule bg-panel px-3.5 py-3 has-[:checked]:border-accent/50 has-[:checked]:bg-wash">
+          <input type="checkbox" name="hotOnly" defaultChecked={prefs.hotOnly} className="mt-1 h-4 w-4 accent-[var(--color-accent)]" />
           <span>
             <span className="font-semibold">Only top companies</span>
             <span className="block text-sm text-muted">

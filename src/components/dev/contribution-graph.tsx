@@ -1,6 +1,7 @@
 import type { Activity } from "@/lib/activity";
+import { ScrollToEnd } from "./scroll-to-end";
 
-const CELL = 10;
+const CELL = 11;
 const GAP = 3;
 const STEP = CELL + GAP;
 const LEFT = 30;
@@ -44,12 +45,11 @@ export function ContributionGraph({ activity }: { activity: Activity }) {
 
   return (
     <div>
-      {/* row-reverse makes a narrow screen start scrolled to the most recent weeks */}
-      <div className="flex flex-row-reverse overflow-x-auto">
+      <ScrollToEnd className="overflow-x-auto">
         <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} role="img" aria-labelledby="graph-title" className="block min-w-max">
           <title id="graph-title">Software engineering internship postings per day over the past year</title>
           {monthLabels.map((m) => (
-            <text key={`${m.x}-${m.text}`} x={m.x} y={10} className="fill-gh-fg text-[10px]">
+            <text key={`${m.x}-${m.text}`} x={m.x} y={10} className="fill-muted font-data text-[10px]">
               {m.text}
             </text>
           ))}
@@ -58,7 +58,7 @@ export function ContributionGraph({ activity }: { activity: Activity }) {
             [3, "Wed"],
             [5, "Fri"],
           ].map(([row, text]) => (
-            <text key={text} x={0} y={TOP + (row as number) * STEP + 9} className="fill-gh-fg text-[10px]">
+            <text key={text} x={0} y={TOP + (row as number) * STEP + 9} className="fill-muted font-data text-[10px]">
               {text}
             </text>
           ))}
@@ -73,7 +73,7 @@ export function ContributionGraph({ activity }: { activity: Activity }) {
                 width={CELL}
                 height={CELL}
                 rx={2}
-                style={{ fill: `var(--gh-l${level(n)})`, outline: "1px solid color-mix(in srgb, var(--gh-fg) 6%, transparent)", outlineOffset: -1 }}
+                style={{ fill: `var(--heat-${level(n)})` }}
               >
                 <title>
                   {n === 0
@@ -84,11 +84,11 @@ export function ContributionGraph({ activity }: { activity: Activity }) {
             );
           })}
         </svg>
-      </div>
-      <div className="mt-2 flex items-center justify-end gap-1 text-xs text-gh-muted" aria-hidden>
+      </ScrollToEnd>
+      <div className="font-data mt-3 flex items-center justify-end gap-1 text-[0.7rem] text-muted" aria-hidden>
         <span className="mr-1">Less</span>
         {[0, 1, 2, 3, 4].map((l) => (
-          <span key={l} className="inline-block h-[10px] w-[10px] rounded-[2px]" style={{ background: `var(--gh-l${l})` }} />
+          <span key={l} className="inline-block h-[10px] w-[10px] rounded-[2px]" style={{ background: `var(--heat-${l})` }} />
         ))}
         <span className="ml-1">More</span>
       </div>

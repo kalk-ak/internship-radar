@@ -11,7 +11,7 @@ export function SignupForm({ config }: { config: ChannelConfig }) {
   if (state.ok) {
     return (
       <div className="space-y-5" role="status">
-        <p className="font-display text-3xl font-extrabold [font-variation-settings:'wdth'_110]">You&apos;re on the list.</p>
+        <p className="font-head text-3xl font-bold">You&apos;re on the list.</p>
         <SetupResults reports={state.reports ?? []} telegramUrl={state.telegramUrl} />
         {state.manageUrl && (
           <div className="rounded-xl bg-wash p-4 text-sm">
@@ -41,7 +41,7 @@ export function SignupForm({ config }: { config: ChannelConfig }) {
       <button
         type="submit"
         disabled={pending}
-        className="w-full rounded-xl bg-ink px-6 py-3.5 text-base font-semibold text-paper transition-opacity hover:opacity-90 disabled:opacity-60 sm:w-auto"
+        className="w-full rounded-xl bg-accent px-6 py-3.5 text-base font-semibold text-accent-ink transition-colors hover:bg-accent-hover disabled:opacity-60 sm:w-auto"
       >
         {pending ? "Setting up your alerts…" : "Start alerts"}
       </button>

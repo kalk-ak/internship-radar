@@ -8,7 +8,7 @@ import { SubscriptionFields, type ChannelConfig } from "./subscription-fields";
 type Bound = (prev: FormState, form: FormData) => Promise<FormState>;
 
 export const adminInput =
-  "w-full rounded-lg border border-rule bg-panel px-3 py-2 text-sm placeholder:text-muted/80 focus:border-ink focus:outline-none";
+  "w-full rounded-lg border border-rule-strong bg-paper px-3 py-2 text-sm text-ink focus:border-accent focus:outline-none";
 
 function Message({ state }: { state: FormState }) {
   if (!state.message) return null;
@@ -30,7 +30,7 @@ export function LoginForm({ action }: { action: Bound }) {
         <input id="password" name="password" type="password" required autoComplete="current-password" className={adminInput} />
       </div>
       <Message state={state} />
-      <button disabled={pending} className="rounded-lg bg-ink px-5 py-2.5 font-semibold text-paper disabled:opacity-60">
+      <button disabled={pending} className="rounded-lg bg-accent px-5 py-2.5 font-semibold text-accent-ink hover:bg-accent-hover disabled:opacity-60">
         {pending ? "Signing in…" : "Sign in"}
       </button>
     </form>
@@ -54,7 +54,7 @@ export function SettingsForm({
       {children}
       <Message state={state} />
       <div className="flex flex-wrap items-center gap-4 pt-1">
-        <button disabled={pending} className="rounded-lg bg-ink px-4 py-2 text-sm font-semibold text-paper disabled:opacity-60">
+        <button disabled={pending} className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-accent-ink hover:bg-accent-hover disabled:opacity-60">
           {pending ? "Saving…" : submitLabel}
         </button>
         {removable && (
@@ -102,12 +102,12 @@ export function AddSubscriberForm({ action, config }: { action: Bound; config: C
     <form action={formAction} className="space-y-6">
       <SubscriptionFields config={config} />
       <label className="flex items-center gap-2 text-sm">
-        <input type="checkbox" name="trustEmail" defaultChecked className="accent-ink" />
+        <input type="checkbox" name="trustEmail" defaultChecked className="accent-[var(--color-accent)]" />
         Skip email confirmation (I know this address is right)
       </label>
       <Message state={state} />
       {state.reports && <SetupResults reports={state.reports} telegramUrl={state.telegramUrl} />}
-      <button disabled={pending} className="rounded-lg bg-ink px-5 py-2.5 font-semibold text-paper disabled:opacity-60">
+      <button disabled={pending} className="rounded-lg bg-accent px-5 py-2.5 font-semibold text-accent-ink hover:bg-accent-hover disabled:opacity-60">
         {pending ? "Adding…" : "Add subscriber"}
       </button>
     </form>

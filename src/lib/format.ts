@@ -118,10 +118,10 @@ export function emailContent(alert: Alert, links: { manage?: string; board: stri
   const html = `<!doctype html>
 <html><body style="margin:0;padding:0;background:#f6f2ec;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
   <div style="max-width:620px;margin:0 auto;padding:28px 16px;">
-    <div style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#c2410c;font-weight:700;">Internship Radar</div>
+    <div style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#b45309;font-weight:700;">Internship Radar</div>
     <h1 style="font-size:24px;line-height:1.25;color:#1b1813;margin:8px 0 20px;">${escapeHtml(alert.headline)}</h1>
     ${sections}
-    ${hidden ? `<p style="font-size:14px;color:#1b1813;"><a href="${escapeHtml(links.board)}" style="color:#c2410c;">See ${hidden} more roles on the board →</a></p>` : ""}
+    ${hidden ? `<p style="font-size:14px;color:#1b1813;"><a href="${escapeHtml(links.board)}" style="color:#b45309;">See ${hidden} more roles on the board →</a></p>` : ""}
     <p style="font-size:12px;color:#8a8175;margin-top:28px;line-height:1.6;">
       ${links.manage ? `<a href="${escapeHtml(links.manage)}" style="color:#8a8175;">Manage your alerts or unsubscribe</a>` : ""}
     </p>

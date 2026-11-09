@@ -1,10 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import { Anybody, Hanken_Grotesk } from "next/font/google";
+import { IBM_Plex_Sans, Martian_Mono } from "next/font/google";
 import { appUrl } from "@/lib/env";
 import "./globals.css";
 
-const anybody = Anybody({ subsets: ["latin"], axes: ["wdth"], variable: "--font-anybody" });
-const hanken = Hanken_Grotesk({ subsets: ["latin"], variable: "--font-hanken" });
+const martian = Martian_Mono({ subsets: ["latin"], axes: ["wdth"], variable: "--font-martian" });
+const plex = IBM_Plex_Sans({ subsets: ["latin"], axes: ["wdth"], variable: "--font-plex" });
 
 export const metadata: Metadata = {
   metadataBase: new URL(appUrl()),
@@ -17,11 +17,11 @@ export const metadata: Metadata = {
     "Checks for new internship postings every 5 minutes and alerts you on email, Telegram, Discord or WhatsApp when FAANG+ and top quant firms open new SWE internship roles.",
 };
 
-export const viewport: Viewport = { themeColor: "#f3f5fa" };
+export const viewport: Viewport = { themeColor: "#0a0d14", colorScheme: "dark" };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${anybody.variable} ${hanken.variable} antialiased`}>
+    <html lang="en" className={`${martian.variable} ${plex.variable} antialiased`}>
       <body className="min-h-dvh">{children}</body>
     </html>
   );

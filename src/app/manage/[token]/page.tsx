@@ -19,7 +19,7 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[token]">) {
   if (!sub) {
     return (
       <div className="max-w-xl">
-        <h1 className="font-display text-4xl font-extrabold [font-variation-settings:'wdth'_110]">This link doesn&apos;t work anymore.</h1>
+        <h1 className="font-head text-4xl font-bold">This link doesn&apos;t work anymore.</h1>
         <p className="mt-3 text-ink-soft">
           The subscription was removed or the link was mistyped. You can{" "}
           <Link href="/#alerts" className="font-semibold underline underline-offset-2">
@@ -49,7 +49,7 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[token]">) {
             Email confirmed. Alerts will arrive at {email?.address}.
           </p>
         )}
-        <h1 className="font-display text-4xl font-extrabold tracking-tight [font-variation-settings:'wdth'_112] sm:text-5xl">
+        <h1 className="font-head text-4xl font-bold sm:text-5xl">
           Your alerts, {sub.name}
         </h1>
         <p className="mt-3 text-ink-soft">
@@ -60,11 +60,11 @@ async function Manage({ params, searchParams }: PageProps<"/manage/[token]">) {
               : "No alerts yet. You'll get one as soon as a matching role is posted."}
         </p>
         {tgUrl && (
-          <div className="mt-6 flex flex-col gap-3 rounded-xl border border-ink bg-panel p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mt-6 flex flex-col gap-3 rounded-xl border border-accent/50 bg-wash p-4 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm">
               <span className="font-semibold">Finish connecting Telegram.</span> Open the bot and press Start.
             </p>
-            <a href={tgUrl} target="_blank" rel="noopener noreferrer" className="w-fit rounded-lg bg-ink px-4 py-2 text-sm font-semibold text-paper">
+            <a href={tgUrl} target="_blank" rel="noopener noreferrer" className="w-fit rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-accent-ink hover:bg-accent-hover">
               Open Telegram
             </a>
           </div>

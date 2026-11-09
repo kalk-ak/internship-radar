@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { heatOf, timeAgo } from "@/lib/heat";
+import { heatOf, timeAgo, timeAgoShort } from "@/lib/heat";
 
 const HEAT_CLASS = { hot: "text-hot-text", warm: "text-warm-text", cool: "text-muted" } as const;
 
-export function TimeAgo({ at, colored = true, className = "" }: { at: number; colored?: boolean; className?: string }) {
+export function TimeAgo({ at, colored = true, short = false, className = "" }: { at: number; colored?: boolean; short?: boolean; className?: string }) {
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 30_000);
@@ -14,11 +14,11 @@ export function TimeAgo({ at, colored = true, className = "" }: { at: number; co
   return (
     <time
       dateTime={new Date(at).toISOString()}
-      title={new Date(at).toLocaleString()}
+      title={new Date(at).toLocaleString("en-US", { timeZone: "America/Los_Angeles", timeZoneName: "short" })}
       suppressHydrationWarning
       className={`${colored ? HEAT_CLASS[heatOf(at, now)] : ""} tabular-nums ${className}`}
     >
-      {timeAgo(at, now)}
+      {short ? timeAgoShort(at, now) : timeAgo(at, now)}
     </time>
   );
 }

@@ -41,7 +41,7 @@ const SECTIONS = [
 function Section({ id, title, intro, children }: { id: string; title: string; intro?: ReactNode; children: ReactNode }) {
   return (
     <section id={id} className="scroll-mt-20 border-t border-rule py-10">
-      <h2 className="font-display text-2xl font-extrabold tracking-tight [font-variation-settings:'wdth'_110]">{title}</h2>
+      <h2 className="font-head text-2xl font-bold">{title}</h2>
       {intro && <div className="mt-1 max-w-3xl text-sm text-muted">{intro}</div>}
       <div className="mt-6">{children}</div>
     </section>
@@ -152,7 +152,7 @@ async function Dashboard() {
                 </div>
               </details>
               <label className="flex items-center gap-2 text-sm">
-                <input type="checkbox" name="subscribeSelf" defaultChecked={!ready.email} className="accent-ink" />
+                <input type="checkbox" name="subscribeSelf" defaultChecked={!ready.email} className="accent-[var(--color-accent)]" />
                 Also subscribe this address to hot SWE alerts
               </label>
             </SettingsForm>
@@ -259,7 +259,7 @@ async function Dashboard() {
                         <div className="absolute right-0 z-20 mt-2 w-60 space-y-2 rounded-xl border border-rule bg-panel p-3 shadow-lg">
                           <ActionButton action={adminSubscriberAction.bind(null, s.id, "test")}>Send test alert</ActionButton>
                           <ActionButton action={adminSubscriberAction.bind(null, s.id, "pause")}>{s.paused ? "Resume" : "Pause"}</ActionButton>
-                          <a href={manageUrl(s)} className="block rounded-lg border border-rule-strong px-4 py-2.5 text-sm font-semibold hover:border-ink">
+                          <a href={manageUrl(s)} className="block rounded-lg border border-rule-strong px-4 py-2.5 text-sm font-semibold hover:border-ink-soft">
                             Open their manage page
                           </a>
                           <ActionButton action={adminSubscriberAction.bind(null, s.id, "delete")} confirm={`Remove ${s.name}?`} tone="danger">
@@ -341,7 +341,7 @@ async function Dashboard() {
             rows={4}
             defaultValue={(settings.extraHotCompanies ?? []).join("\n")}
             placeholder={"Capital One\nIntuit"}
-            className="w-full max-w-xl rounded-lg border border-rule bg-panel px-3 py-2 text-sm focus:border-ink focus:outline-none"
+            className="w-full max-w-xl rounded-lg border border-rule bg-panel px-3 py-2 text-sm focus:border-accent focus:outline-none"
           />
         </SettingsForm>
         <details className="mt-5 text-sm">
@@ -361,14 +361,14 @@ async function Gate() {
   if (!(await isAdmin())) {
     return (
       <div className="py-10">
-        <h1 className="mb-6 font-display text-3xl font-extrabold [font-variation-settings:'wdth'_110]">Admin sign in</h1>
+        <h1 className="mb-6 font-head text-3xl font-bold">Admin sign in</h1>
         <LoginForm action={loginAction} />
       </div>
     );
   }
   return (
     <>
-      <nav className="sticky top-0 z-30 -mx-4 mb-2 flex items-center gap-1 overflow-x-auto bg-paper/95 px-4 py-3 backdrop-blur sm:mx-0 sm:px-0">
+      <nav className="sticky top-0 z-30 -mx-4 mb-2 flex items-center gap-1 overflow-x-auto bg-paper/90 px-4 py-3 backdrop-blur sm:mx-0 sm:px-0">
         {SECTIONS.map(([id, label]) => (
           <a key={id} href={`#${id}`} className="shrink-0 rounded-full px-3 py-1.5 text-sm font-semibold text-ink-soft hover:bg-wash">
             {label}

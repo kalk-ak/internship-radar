@@ -17,30 +17,30 @@ export async function GET(_request: Request, ctx: RouteContext<"/api/instagram/c
   const roles = card.roles.slice(0, 5);
   const png = new ImageResponse(
     (
-      <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", background: "#14110d", color: "#fff8ef", padding: 80, fontFamily: "sans-serif" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 18, fontSize: 30, letterSpacing: 6, textTransform: "uppercase", color: "#ff7a3d" }}>
-          <div style={{ width: 22, height: 22, borderRadius: 11, background: "#ff5a1f", display: "flex" }} />
+      <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", background: "#0a0d14", color: "#e7eaf3", padding: 80, fontFamily: "sans-serif" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 18, fontSize: 30, letterSpacing: 6, textTransform: "uppercase", color: "#ffb547" }}>
+          <div style={{ width: 22, height: 22, borderRadius: 11, background: "#ffb547", display: "flex" }} />
           Internship Radar · Hot drop
         </div>
         <div style={{ display: "flex", flexDirection: "column", marginTop: 70 }}>
           <div style={{ fontSize: 120, fontWeight: 800, lineHeight: 1.02, letterSpacing: -3 }}>{card.company}</div>
-          <div style={{ fontSize: 54, color: "#d8cfc3", marginTop: 18 }}>
+          <div style={{ fontSize: 54, color: "#b4bccf", marginTop: 18 }}>
             just opened {card.roles.length} internship role{card.roles.length === 1 ? "" : "s"}
           </div>
         </div>
         <div style={{ display: "flex", flexDirection: "column", marginTop: 70, gap: 26 }}>
           {roles.map((r) => (
-            <div key={r.id} style={{ display: "flex", flexDirection: "column", borderLeft: "6px solid #ff5a1f", paddingLeft: 28 }}>
+            <div key={r.id} style={{ display: "flex", flexDirection: "column", borderLeft: "6px solid #ffb547", paddingLeft: 28 }}>
               <div style={{ fontSize: 40, fontWeight: 700 }}>{r.title.length > 60 ? `${r.title.slice(0, 57)}…` : r.title}</div>
-              <div style={{ fontSize: 30, color: "#a89e91", marginTop: 6 }}>
+              <div style={{ fontSize: 30, color: "#7c859e", marginTop: 6 }}>
                 {[locationLabel(r), r.terms.join(", ")].filter(Boolean).join(" · ")}
               </div>
             </div>
           ))}
         </div>
-        <div style={{ display: "flex", marginTop: "auto", justifyContent: "space-between", alignItems: "flex-end", fontSize: 30, color: "#a89e91" }}>
+        <div style={{ display: "flex", marginTop: "auto", justifyContent: "space-between", alignItems: "flex-end", fontSize: 30, color: "#7c859e" }}>
           <div style={{ display: "flex" }}>Apply early. Roles fill fast.</div>
-          <div style={{ display: "flex", color: "#ff7a3d" }}>Free alerts: link in bio</div>
+          <div style={{ display: "flex", color: "#ffb547" }}>Free alerts: link in bio</div>
         </div>
       </div>
     ),

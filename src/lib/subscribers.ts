@@ -103,7 +103,7 @@ async function sendEmailVerification(sub: Subscriber, settings: Settings): Promi
     subject: "Confirm your Internship Radar alerts",
     text: `Hi ${sub.name},\n\nConfirm your email to start getting internship alerts:\n${link}\n\nIf you didn't sign up, ignore this email.`,
     html: `<div style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;max-width:520px;margin:0 auto;padding:24px;color:#1b1813">
-      <p style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#c2410c;font-weight:700">Internship Radar</p>
+      <p style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#b45309;font-weight:700">Internship Radar</p>
       <h1 style="font-size:22px">Confirm your email, ${escapeHtml(sub.name)}</h1>
       <p>Click below to start getting alerts when top companies open internship roles.</p>
       <p><a href="${link}" style="display:inline-block;background:#1b1813;color:#fff8ef;padding:12px 18px;border-radius:10px;text-decoration:none;font-weight:600">Confirm email</a></p>

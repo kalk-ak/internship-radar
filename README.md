@@ -24,7 +24,7 @@ It runs entirely on free tiers: Vercel Hobby, Upstash Redis free, and GitHub Act
 - **No accounts.** Subscribers get a private manage link to change channels, send themselves a test, pause, or unsubscribe.
 - **Admin dashboard.** Shows scheduler health and recent errors. It's also where you paste channel credentials (stored AES-GCM encrypted), manage subscribers, read the delivery log, and edit the company list.
 - **Safe to retry.** A Redis lock plus a seen-set means overlapping triggers never send duplicate alerts. The first run saves a baseline instead of flooding everyone.
-- **Discoverable.** A developer page at `/swe-internship-alerts` shows live GitHub stars, a posting-activity graph, and a FAQ backed by live data, with dark mode by default. It ships JSON-LD (`SoftwareApplication`, `SoftwareSourceCode`, `FAQPage`), a sitemap, a `robots.txt` that welcomes AI crawlers, and an [`/llms.txt`](https://llmstxt.org) summary for answer engines.
+- **Discoverable.** A developer page at `/swe-internship-alerts` shows live GitHub stars, a posting-activity graph, and a FAQ backed by live data. It ships JSON-LD (`SoftwareApplication`, `SoftwareSourceCode`, `FAQPage`), a sitemap, a `robots.txt` that welcomes AI crawlers, and an [`/llms.txt`](https://llmstxt.org) summary for answer engines.
 - **Follows new seasons.** Detects the newest `SummerYYYY-Internships` repo automatically and re-baselines silently when Simplify starts a new one.
 
 ## How it works

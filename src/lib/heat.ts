@@ -51,3 +51,15 @@ export function dayLabel(at: number, now = Date.now()): string {
   if (diff === 1) return "Yesterday";
   return new Date(at).toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric", timeZone: TIME_ZONE });
 }
+
+/** Compact form for log columns: now, 12m, 3h, 2d, then a date. */
+export function timeAgoShort(at: number, now = Date.now()): string {
+  const m = Math.max(0, Math.round((now - at) / 60_000));
+  if (m < 1) return "now";
+  if (m < 60) return `${m}m`;
+  const h = Math.round(m / 60);
+  if (h < 24) return `${h}h`;
+  const d = Math.max(1, dayNumber(now) - dayNumber(at));
+  if (d < 7) return `${d}d`;
+  return new Date(at).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: TIME_ZONE }).toLowerCase();
+}

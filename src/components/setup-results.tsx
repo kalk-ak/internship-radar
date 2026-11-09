@@ -18,7 +18,7 @@ export function SetupResults({ reports, telegramUrl }: { reports: SetupReport[];
           <span className={`w-fit rounded-full px-2 py-0.5 text-xs font-semibold ${TONE[r.status].cls}`}>{TONE[r.status].mark}</span>
           <span className="text-sm text-ink-soft">{r.message}</span>
           {r.channel === "telegram" && telegramUrl && (
-            <a href={telegramUrl} target="_blank" rel="noopener noreferrer" className="w-fit rounded-lg bg-ink px-3 py-1.5 text-sm font-semibold text-paper sm:ml-auto">
+            <a href={telegramUrl} target="_blank" rel="noopener noreferrer" className="w-fit rounded-lg bg-accent px-3 py-1.5 text-sm font-semibold text-accent-ink hover:bg-accent-hover sm:ml-auto">
               Open Telegram
             </a>
           )}

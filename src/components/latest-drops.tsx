@@ -1,21 +1,12 @@
-import type { CSSProperties } from "react";
+import Link from "next/link";
+import type { ReactNode } from "react";
 import { connection } from "next/server";
-import { getFeed } from "@/lib/checker";
-import { heatOf } from "@/lib/heat";
+import { getFeed, getState } from "@/lib/checker";
 import type { Role } from "@/lib/types";
+import { CATEGORY_STYLE } from "@/lib/ui";
 import { TimeAgo } from "./time-ago";
 
-/** Size and width shrink with each step down the stack: newest drop is widest. */
-const STEPS = [
-  { size: 6.25, wdth: 150, wght: 850 },
-  { size: 4.5, wdth: 128, wght: 800 },
-  { size: 3.4, wdth: 108, wght: 760 },
-  { size: 2.6, wdth: 92, wght: 720 },
-  { size: 2.1, wdth: 80, wght: 680 },
-  { size: 1.7, wdth: 72, wght: 650 },
-];
-
-const DOT = { hot: "bg-hot", warm: "bg-warm", cool: "bg-cool" } as const;
+const ROWS = 7;
 
 function byCompany(feed: Role[]) {
   const seen = new Map<string, { company: string; roles: Role[] }>();
@@ -25,60 +16,88 @@ function byCompany(feed: Role[]) {
     entry.roles.push(r);
     seen.set(r.company, entry);
   }
-  return [...seen.values()].slice(0, STEPS.length);
+  return [...seen.values()].slice(0, ROWS);
 }
 
+function healthy(lastRunAt?: number) {
+  return Boolean(lastRunAt && Date.now() - lastRunAt < 30 * 60 * 1000);
+}
+
+function Frame({ live, children }: { live: boolean; children: ReactNode }) {
+  return (
+    <div className="overflow-hidden rounded-xl border border-rule bg-panel shadow-[0_0_0_1px_rgb(255_181_71/0.04),0_30px_80px_-30px_rgb(255_181_71/0.18)]">
+      <div className="font-data flex items-center justify-between border-b border-rule px-4 py-2.5 text-xs text-muted">
+        <span>radar.log</span>
+        <span className="flex items-center gap-2">
+          <span className={`live-dot relative inline-block h-1.5 w-1.5 rounded-full ${live ? "bg-ok text-ok" : "bg-cool text-cool"}`} aria-hidden />
+          {live ? "live" : "idle"}
+        </span>
+      </div>
+      <div className="font-data px-4 py-4 text-[0.8rem] leading-relaxed sm:px-5">{children}</div>
+    </div>
+  );
+}
+
+/** The hero: newest top-company SWE drops, rendered as a live log. */
 export async function LatestDrops() {
   await connection();
-  const drops = byCompany(await getFeed(120));
-
-  if (drops.length === 0) {
-    return (
-      <div className="rounded-2xl border border-dashed border-rule-strong p-8 text-ink-soft">
-        <p className="font-semibold text-ink">The first check hasn&apos;t run yet.</p>
-        <p className="mt-1 text-sm">New drops from top companies will stack up here within a few minutes.</p>
-      </div>
-    );
-  }
+  const [feed, state] = await Promise.all([getFeed(150), getState()]);
+  const drops = byCompany(feed);
+  const live = healthy(state.lastRunAt);
 
   return (
-    <ol className="flex flex-col gap-4" aria-label="Latest hot SWE internship drops, newest first">
-      {drops.map((d, i) => {
-        const step = STEPS[i];
-        // Long names get scaled down so the widest step still fits the column.
-        const fit = Math.min(1, 10 / Math.max(d.company.length, 1));
-        const size = i < 2 ? step.size * Math.max(fit, 0.42) : step.size * Math.max(fit, 0.6);
-        const newest = d.roles[0];
-        return (
-          <li key={d.company}>
-            <a href={`/?q=${encodeURIComponent(d.company)}#board`} className="group block">
-              <span
-                className="block font-display leading-[0.92] tracking-tight text-ink transition-colors group-hover:text-hot-text"
-                style={{ fontSize: `clamp(${Math.max(size * 0.6, 1.35).toFixed(2)}rem, ${(size * 1.55).toFixed(2)}vw, ${size.toFixed(2)}rem)`, fontVariationSettings: `"wdth" ${step.wdth}, "wght" ${step.wght}` }}
-              >
-                {d.company}
-              </span>
-              <span className="mt-1.5 flex items-center gap-2 text-sm text-ink-soft">
-                <span className={`h-2 w-2 rounded-full ${DOT[heatOf(newest.postedAt)]}`} aria-hidden />
-                <span>
-                  {d.roles.length === 1 ? newest.title : `${d.roles.length} SWE roles`},{" "}
-                  <TimeAgo at={newest.postedAt} className="font-semibold" />
-                </span>
-              </span>
-            </a>
-          </li>
-        );
-      })}
-    </ol>
+    <Frame live={live}>
+      <p className="text-muted">
+        <span className="text-accent">$</span> radar watch --top-companies --every 5m
+      </p>
+      {drops.length === 0 ? (
+        <p className="mt-4 text-ink-soft">waiting for the first check…</p>
+      ) : (
+        <ol className="mt-4 space-y-3" aria-label="Latest top-company SWE internship drops, newest first">
+          {drops.map(({ company, roles }) => {
+            const newest = roles[0];
+            const cat = CATEGORY_STYLE[newest.category];
+            return (
+              <li key={company}>
+                <Link href={`/?q=${encodeURIComponent(company)}#board`} className="group grid grid-cols-[3.25rem_minmax(0,1fr)] gap-x-3 rounded-md -mx-2 px-2 py-1 hover:bg-wash">
+                  <TimeAgo at={newest.postedAt} short className="pt-px text-right" />
+                  <span className="min-w-0">
+                    <span className="flex items-baseline gap-2">
+                      <span className="truncate font-semibold text-ink group-hover:text-accent">{company}</span>
+                      <span className="shrink-0 text-accent">+{roles.length}</span>
+                      <span className={`ml-auto shrink-0 ${cat.text}`}>{cat.short}</span>
+                    </span>
+                    <span className="block truncate text-muted">{roles.length === 1 ? newest.title : roles.map((r) => r.title).slice(0, 2).join(", ")}</span>
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
+        </ol>
+      )}
+      <p className="mt-5 text-ink-soft">
+        <span className="text-accent">›</span>{" "}
+        {state.lastRunAt ? (
+          <>
+            checked <TimeAgo at={state.lastRunAt} colored={false} />, watching
+          </>
+        ) : (
+          "starting up"
+        )}{" "}
+        <span className="cursor" aria-hidden />
+      </p>
+    </Frame>
   );
 }
 
 export function LatestDropsSkeleton() {
   return (
-    <div className="flex flex-col gap-5" aria-hidden>
-      {STEPS.slice(0, 5).map((s, i) => (
-        <div key={i} className="h-[var(--h)] rounded-md bg-wash" style={{ "--h": `${s.size * 0.7}rem`, width: `${90 - i * 14}%` } as CSSProperties} />
-      ))}
-    </div>
+    <Frame live={false}>
+      <div className="space-y-4" aria-hidden>
+        {Array.from({ length: ROWS }, (_, i) => (
+          <div key={i} className="h-8 animate-pulse rounded bg-wash motion-reduce:animate-none" style={{ width: `${92 - i * 6}%` }} />
+        ))}
+      </div>
+    </Frame>
   );
 }

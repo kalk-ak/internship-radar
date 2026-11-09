@@ -30,7 +30,7 @@ export function ManageForm({
         </p>
       )}
       {state.reports && <SetupResults reports={state.reports} telegramUrl={state.telegramUrl} />}
-      <button type="submit" disabled={pending} className="rounded-xl bg-ink px-6 py-3 font-semibold text-paper hover:opacity-90 disabled:opacity-60">
+      <button type="submit" disabled={pending} className="rounded-xl bg-accent px-6 py-3 font-semibold text-accent-ink hover:bg-accent-hover disabled:opacity-60">
         {pending ? "Saving…" : "Save changes"}
       </button>
     </form>
@@ -64,7 +64,7 @@ export function ActionButton({
           });
         }}
         className={`w-full rounded-lg border px-4 py-2.5 text-left text-sm font-semibold transition-colors disabled:opacity-60 ${
-          tone === "danger" ? "border-bad/40 text-bad hover:bg-bad-wash" : "border-rule-strong hover:border-ink"
+          tone === "danger" ? "border-bad/40 text-bad hover:bg-bad-wash" : "border-rule-strong hover:border-ink-soft"
         }`}
       >
         {pending ? "Working…" : children}
