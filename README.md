@@ -24,6 +24,7 @@ It runs entirely on free tiers: Vercel Hobby, Upstash Redis free, and GitHub Act
 - **No accounts.** Subscribers get a private manage link to change channels, send themselves a test, pause, or unsubscribe.
 - **Admin dashboard.** Shows scheduler health and recent errors. It's also where you paste channel credentials (stored AES-GCM encrypted), manage subscribers, read the delivery log, and edit the company list.
 - **Safe to retry.** A Redis lock plus a seen-set means overlapping triggers never send duplicate alerts. The first run saves a baseline instead of flooding everyone.
+- **Discoverable.** A developer page at `/swe-internship-alerts` shows live GitHub stars, a posting-activity graph, and a FAQ backed by live data, with dark mode by default. It ships JSON-LD (`SoftwareApplication`, `SoftwareSourceCode`, `FAQPage`), a sitemap, a `robots.txt` that welcomes AI crawlers, and an [`/llms.txt`](https://llmstxt.org) summary for answer engines.
 - **Follows new seasons.** Detects the newest `SummerYYYY-Internships` repo automatically and re-baselines silently when Simplify starts a new one.
 
 ## How it works
@@ -133,6 +134,7 @@ The first check records everything currently listed as already seen. Alerts star
 | `ADMIN_PASSWORD` | yes | Password for `/admin`. |
 | `KV_REST_API_URL`, `KV_REST_API_TOKEN` | yes | Upstash Redis REST credentials. `UPSTASH_REDIS_REST_*` also works. |
 | `APP_URL` | no | Public URL. Defaults to the Vercel production domain. |
+| `GITHUB_TOKEN` | no | A token with no scopes, used for the star count and repo stats on the developer page. It raises GitHub's limit from 60 to 5,000 requests an hour. Stats are cached for 10 minutes either way. |
 | `SIMPLIFY_REPO`, `SIMPLIFY_BRANCH` | no | Pin a source repo instead of auto-detecting. Default branch is `dev`. |
 | `GMAIL_USER`, `GMAIL_APP_PASSWORD`, `SMTP_HOST`, `SMTP_PORT`, `EMAIL_FROM` | no | Email settings. These override the admin page. |
 | `TELEGRAM_BOT_TOKEN` | no | Overrides the admin page. Connect it from the admin page once to register the webhook. |
@@ -156,6 +158,8 @@ Locally, `/admin` accepts the password `admin` unless `ADMIN_PASSWORD` is set. C
 src/
   app/
     page.tsx                  public page: live drops, roles board, signup
+    swe-internship-alerts/    developer page: GitHub-style, SEO/AEO content
+    llms.txt, robots.ts, sitemap.ts, opengraph-image.tsx
     manage/[token]/page.tsx   subscriber self-service
     admin/                    dashboard + server actions
     api/check                 the polling endpoint
@@ -173,6 +177,8 @@ src/
     subscribers.ts            sign-up, verification, manage links
     settings.ts               encrypted channel credentials
     kv.ts                     Redis wrapper with an in-memory fallback
+    seo.ts, github.ts         FAQ + JSON-LD content, cached GitHub stats
+    activity.ts               daily posting counts for the activity graph
 tests/                        vitest suites
 ```
 

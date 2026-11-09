@@ -330,7 +330,7 @@ async function Dashboard() {
         </div>
       </Section>
 
-      <Section id="companies" title="Top companies" intro="Roles at these companies are marked hot. The built-in list mirrors SimplifyJobs' FAANG+ set plus top quant firms and AI labs.">
+      <Section id="companies" title="Top companies" intro="Roles at these companies are marked hot. The built-in list covers FAANG+ companies plus top quant firms and AI labs.">
         <SettingsForm action={saveCompaniesAction} submitLabel="Save companies">
           <label htmlFor="extraHotCompanies" className="block text-sm font-semibold">
             Extra companies, one per line or comma separated

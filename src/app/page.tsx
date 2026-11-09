@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import { connection } from "next/server";
 import { Board } from "@/components/board";
@@ -8,7 +9,6 @@ import { TimeAgo } from "@/components/time-ago";
 import { parseBoardQuery, queryBoard } from "@/lib/board";
 import { BOARD_WINDOW_MS, getBoard, getState } from "@/lib/checker";
 import { publicChannelConfig } from "@/lib/public-config";
-import { repoUrl } from "@/lib/simplify";
 
 /** No successful check for 30 minutes means the scheduler has stalled. */
 function isStale(lastRunAt: number) {
@@ -25,14 +25,6 @@ async function StatusLine() {
       <span className={`live-dot relative inline-block h-2 w-2 rounded-full ${stale ? "text-cool" : "text-ok"}`} style={{ background: "currentColor" }} aria-hidden />
       <span>
         Last checked <TimeAgo at={state.lastRunAt} colored={false} className="font-semibold text-ink" />
-        {state.repo && (
-          <>
-            {" "}from{" "}
-            <a href={repoUrl(state.repo)} className="font-medium underline decoration-rule-strong underline-offset-2 hover:decoration-ink">
-              {state.repo.split("/")[1]}
-            </a>
-          </>
-        )}
         .
       </span>
     </p>
@@ -83,6 +75,8 @@ async function Notice({ searchParams }: { searchParams: PageProps<"/">["searchPa
   );
 }
 
+export const metadata: Metadata = { alternates: { canonical: "/" } };
+
 export default function Home(props: PageProps<"/">) {
   return (
     <>
@@ -97,7 +91,7 @@ export default function Home(props: PageProps<"/">) {
               Get a message when top companies open SWE internships.
             </h1>
             <p className="max-w-xl text-lg text-ink-soft">
-              Internship Radar checks the SimplifyJobs internship list every 5 minutes. When Google, Jane Street, OpenAI or
+              Internship Radar checks for new internship postings every 5 minutes. When Google, Jane Street, OpenAI or
               another top company posts a new role, you hear about it on email, Telegram, Discord or WhatsApp, usually
               before the applicant pile forms.
             </p>
@@ -147,8 +141,8 @@ export default function Home(props: PageProps<"/">) {
                 Get alerts
               </h2>
               <p className="mt-3 text-ink-soft">
-                Choose where alerts go and which roles count. Alerts arrive within about 5 minutes of a listing appearing on
-                SimplifyJobs, grouped by company so a big drop is one message, not twenty.
+                Choose where alerts go and which roles count. Alerts arrive within about 5 minutes of a role being listed,
+                grouped by company so a big drop is one message, not twenty.
               </p>
               <p className="mt-4 text-sm text-muted">
                 Free, no account needed. Every alert has a link to change your settings or unsubscribe.

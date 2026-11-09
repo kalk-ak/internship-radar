@@ -1,4 +1,9 @@
+import { StarIcon } from "@primer/octicons-react";
 import Link from "next/link";
+import { connection } from "next/server";
+import { Suspense } from "react";
+import { compactNumber, repoStats } from "@/lib/github";
+import { DEV_PAGE_PATH } from "@/lib/seo";
 
 export const REPO_URL = "https://github.com/kalk-ak/internship-radar";
 
@@ -24,8 +29,15 @@ export function SiteHeader() {
         <a href="#board" className="hidden rounded-lg px-3 py-2 text-ink-soft hover:bg-wash sm:block">
           Open roles
         </a>
-        <a href={REPO_URL} className="hidden rounded-lg px-3 py-2 text-ink-soft hover:bg-wash sm:block">
-          GitHub
+        <Link href={DEV_PAGE_PATH} className="hidden rounded-lg px-3 py-2 text-ink-soft hover:bg-wash md:block">
+          For developers
+        </Link>
+        <a href={REPO_URL} className="hidden items-center gap-1.5 rounded-lg px-3 py-2 text-ink-soft hover:bg-wash sm:flex">
+          <StarIcon size={16} />
+          <span>GitHub</span>
+          <Suspense>
+            <StarCount />
+          </Suspense>
         </a>
         <a href="#alerts" className="whitespace-nowrap rounded-lg bg-ink px-3.5 py-2 text-paper hover:opacity-90">
           Get alerts
@@ -35,22 +47,30 @@ export function SiteHeader() {
   );
 }
 
+async function StarCount() {
+  await connection();
+  const stats = await repoStats();
+  if (!stats) return null;
+  return (
+    <span className="rounded-full bg-wash px-1.5 text-xs tabular-nums" aria-label={`${stats.stars} stars`}>
+      {compactNumber(stats.stars)}
+    </span>
+  );
+}
+
 export function SiteFooter() {
   return (
     <footer className="border-t border-rule">
       <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-8 text-sm text-muted sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <p>
-          Listings come from the{" "}
-          <a className="font-medium text-ink-soft underline underline-offset-2" href="https://github.com/SimplifyJobs">
-            SimplifyJobs
-          </a>{" "}
-          internship list, maintained by Simplify and Pitt CSC. Not affiliated with either.
-        </p>
-        <p>
           <a className="font-medium text-ink-soft underline underline-offset-2" href={REPO_URL}>
             Open source
           </a>{" "}
-          under the MIT license.
+          under the MIT license.{" "}
+          <Link className="font-medium text-ink-soft underline underline-offset-2" href={DEV_PAGE_PATH}>
+            How it works
+          </Link>
+          .
         </p>
       </div>
     </footer>

@@ -1,3 +1,4 @@
+import { buildActivity, type Activity } from "./activity";
 import { HOT_FEED_LIMIT, NEW_LISTING_WINDOW_MS, RUN_LOG_LIMIT, SEEN_RETENTION_MS } from "./env";
 import { kv } from "./kv";
 import { maybeRefreshInstagramToken, notifySubscribers } from "./notify";
@@ -12,6 +13,7 @@ export const KEYS = {
   feed: "feed:hot",
   board: "board:snapshot",
   runs: "log:runs",
+  activity: "stats:activity",
 };
 
 const REPO_RECHECK_MS = 12 * 60 * 60 * 1000;
@@ -29,6 +31,10 @@ export async function getBoard() {
 
 export async function getFeed(limit = 60) {
   return kv().lrange<Role>(KEYS.feed, 0, limit - 1);
+}
+
+export async function getActivity() {
+  return kv().get<Activity>(KEYS.activity);
 }
 
 export async function getRuns(limit = 50) {
@@ -98,8 +104,10 @@ export async function runCheck(trigger: string, opts: { force?: boolean } = {}):
 
     if (listings.changed) {
       log.changed = true;
-      const roles = openRoles(listings.body, hotMatcher(settings.extraHotCompanies));
+      const isHot = hotMatcher(settings.extraHotCompanies);
+      const roles = openRoles(listings.body, isHot);
       await kv().set(KEYS.board, buildBoard(repo, roles, started));
+      await kv().set(KEYS.activity, buildActivity(listings.body, isHot, started));
 
       const candidates = roles.filter((r) => r.postedAt >= started - NEW_LISTING_WINDOW_MS);
       let fresh: Role[] = [];

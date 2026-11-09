@@ -123,8 +123,7 @@ export function emailContent(alert: Alert, links: { manage?: string; board: stri
     ${sections}
     ${hidden ? `<p style="font-size:14px;color:#1b1813;"><a href="${escapeHtml(links.board)}" style="color:#c2410c;">See ${hidden} more roles on the board →</a></p>` : ""}
     <p style="font-size:12px;color:#8a8175;margin-top:28px;line-height:1.6;">
-      Listings come from the open-source <a href="https://github.com/SimplifyJobs" style="color:#8a8175;">SimplifyJobs</a> internship list.
-      ${links.manage ? `<br><a href="${escapeHtml(links.manage)}" style="color:#8a8175;">Manage your alerts or unsubscribe</a>` : ""}
+      ${links.manage ? `<a href="${escapeHtml(links.manage)}" style="color:#8a8175;">Manage your alerts or unsubscribe</a>` : ""}
     </p>
   </div>
 </body></html>`;

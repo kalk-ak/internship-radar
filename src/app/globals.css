@@ -85,3 +85,112 @@
 @media (prefers-reduced-motion: no-preference) {
   html { scroll-behavior: smooth; }
 }
+
+/* ------------------------------------------------------------------
+   Developer page (/swe-internship-alerts): GitHub-style tokens,
+   dark by default. Scoped to .gh-root so the rest of the site keeps
+   its own palette.
+   ------------------------------------------------------------------ */
+.gh-root,
+.gh-root[data-theme="dark"] {
+  --gh-canvas: #0d1117;
+  --gh-subtle: #151b23;
+  --gh-inset: #010409;
+  --gh-border: #3d444d;
+  --gh-border-muted: #2a313c;
+  --gh-fg: #f0f6fc;
+  --gh-muted: #9198a1;
+  --gh-accent: #4493f8;
+  --gh-success: #3fb950;
+  --gh-attention: #d29922;
+  --gh-danger: #f85149;
+  --gh-done: #ab7df8;
+  --gh-tab: #f78166;
+  --gh-btn: #212830;
+  --gh-btn-hover: #262c36;
+  --gh-primary: #238636;
+  --gh-primary-hover: #29903b;
+  --gh-l0: #151b23;
+  --gh-l1: #033a16;
+  --gh-l2: #196c2e;
+  --gh-l3: #2ea043;
+  --gh-l4: #56d364;
+  color-scheme: dark;
+}
+.gh-root[data-theme="light"] {
+  --gh-canvas: #ffffff;
+  --gh-subtle: #f6f8fa;
+  --gh-inset: #f6f8fa;
+  --gh-border: #d1d9e0;
+  --gh-border-muted: #dfe5ea;
+  --gh-fg: #1f2328;
+  --gh-muted: #59636e;
+  --gh-accent: #0969da;
+  --gh-success: #1a7f37;
+  --gh-attention: #9a6700;
+  --gh-danger: #d1242f;
+  --gh-done: #8250df;
+  --gh-tab: #fd8c73;
+  --gh-btn: #f6f8fa;
+  --gh-btn-hover: #eff2f5;
+  --gh-primary: #1f883d;
+  --gh-primary-hover: #1c8139;
+  --gh-l0: #eff2f5;
+  --gh-l1: #aceebb;
+  --gh-l2: #4ac26b;
+  --gh-l3: #2da44e;
+  --gh-l4: #116329;
+  color-scheme: light;
+}
+html:has(.gh-root[data-theme="light"]) { background: #ffffff; }
+html:has(.gh-root:not([data-theme="light"])) { background: #0d1117; }
+html:has(.gh-root) body { background: transparent; }
+
+@theme inline {
+  --color-gh-canvas: var(--gh-canvas);
+  --color-gh-subtle: var(--gh-subtle);
+  --color-gh-inset: var(--gh-inset);
+  --color-gh-border: var(--gh-border);
+  --color-gh-border-muted: var(--gh-border-muted);
+  --color-gh-fg: var(--gh-fg);
+  --color-gh-muted: var(--gh-muted);
+  --color-gh-accent: var(--gh-accent);
+  --color-gh-success: var(--gh-success);
+  --color-gh-attention: var(--gh-attention);
+  --color-gh-danger: var(--gh-danger);
+  --color-gh-done: var(--gh-done);
+  --color-gh-tab: var(--gh-tab);
+  --color-gh-btn: var(--gh-btn);
+  --color-gh-btn-hover: var(--gh-btn-hover);
+  --color-gh-primary: var(--gh-primary);
+  --color-gh-primary-hover: var(--gh-primary-hover);
+  --font-gh: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  --font-gh-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+.gh-root ::selection { background: color-mix(in srgb, var(--gh-accent) 35%, transparent); color: inherit; }
+.gh-root :focus-visible { outline: 2px solid var(--gh-accent); outline-offset: 2px; border-radius: 6px; }
+
+/* README body typography, close to GitHub's markdown rendering */
+.gh-md { font-size: 16px; line-height: 1.6; color: var(--gh-fg); overflow-wrap: break-word; }
+.gh-md > * + * { margin-top: 16px; }
+.gh-md h1, .gh-md h2 { padding-bottom: 0.3em; border-bottom: 1px solid var(--gh-border-muted); font-weight: 600; line-height: 1.25; }
+.gh-md h1 { font-size: 2em; margin-top: 0; }
+.gh-md h2 { font-size: 1.5em; margin-top: 24px; }
+.gh-md h3 { font-size: 1.25em; font-weight: 600; line-height: 1.25; margin-top: 24px; }
+.gh-md h2 + *, .gh-md h3 + * { margin-top: 16px; }
+.gh-md a { color: var(--gh-accent); text-decoration: underline; text-underline-offset: 0.2rem; }
+.gh-md a:hover { text-decoration-thickness: 2px; }
+.gh-md ul { list-style: disc; padding-left: 2em; }
+.gh-md ol { list-style: decimal; padding-left: 2em; }
+.gh-md li + li { margin-top: 0.25em; }
+.gh-md code { font-family: var(--font-gh-mono); font-size: 85%; padding: 0.2em 0.4em; border-radius: 6px; background: color-mix(in srgb, var(--gh-muted) 20%, transparent); }
+.gh-md pre code { background: none; padding: 0; font-size: 100%; }
+.gh-md table { display: block; width: max-content; max-width: 100%; overflow: auto; border-collapse: collapse; font-size: 14px; }
+.gh-md th, .gh-md td { padding: 6px 13px; border: 1px solid var(--gh-border); text-align: left; vertical-align: top; }
+.gh-md th { font-weight: 600; }
+.gh-md tr:nth-child(2n) td { background: var(--gh-subtle); }
+.gh-md blockquote { padding: 0 1em; color: var(--gh-muted); border-left: 0.25em solid var(--gh-border); }
+.gh-md :is(h1, h2, h3) { position: relative; }
+.gh-md .anchor { position: absolute; left: -20px; opacity: 0; color: var(--gh-muted); text-decoration: none; }
+.gh-md :is(h1, h2, h3):hover .anchor { opacity: 1; }
