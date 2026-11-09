@@ -96,7 +96,7 @@ async function Dashboard() {
         </p>
       )}
 
-      <Section id="status" title="Status" intro="The checker runs every 5 minutes from GitHub Actions, with Vercel's own scheduler as a 15-minute backup.">
+      <Section id="status" title="Status" intro="An Upstash QStash schedule runs the checker every 5 minutes. Vercel's scheduler (every 15 minutes) and GitHub Actions are backups.">
         <dl className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <Fact label="Watching">
             {state.repo ? (

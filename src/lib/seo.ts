@@ -82,7 +82,7 @@ export function buildFaq(data: DevPageData): Faq[] {
     {
       id: "how-often",
       q: "How often does Internship Radar check for new internships?",
-      a: "Every 5 minutes. GitHub Actions triggers a check on Vercel, and a Vercel schedule runs every 15 minutes as a backup. Each check uses conditional HTTP requests (ETag), so when the list hasn't changed it finishes in milliseconds.",
+      a: "Every 5 minutes. An Upstash QStash schedule triggers a check on Vercel, and a Vercel schedule runs every 15 minutes as a backup. Each check uses conditional HTTP requests (ETag), so when the list hasn't changed it finishes in milliseconds.",
     },
     {
       id: "top-companies",

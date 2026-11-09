@@ -1,3 +1,4 @@
+import { Receiver } from "@upstash/qstash";
 import { cookies, headers } from "next/headers";
 import { hmac, safeEqual } from "./crypto";
 import { kv } from "./kv";
@@ -60,6 +61,18 @@ export async function rateLimit(bucket: string, limit: number, windowSeconds: nu
   const who = id ?? (await clientIp());
   const n = await kv().incr(`rl:${bucket}:${who}`, windowSeconds);
   return n <= limit;
+}
+
+/** Requests from the Upstash QStash 5-minute schedule carry a signed JWT. */
+export async function qstashAuthorized(signature: string | null, body: string) {
+  const currentSigningKey = process.env.QSTASH_CURRENT_SIGNING_KEY;
+  const nextSigningKey = process.env.QSTASH_NEXT_SIGNING_KEY;
+  if (!signature || !currentSigningKey || !nextSigningKey) return false;
+  try {
+    return await new Receiver({ currentSigningKey, nextSigningKey }).verify({ signature, body });
+  } catch {
+    return false;
+  }
 }
 
 export function cronAuthorized(authHeader: string | null) {

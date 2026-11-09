@@ -1,7 +1,7 @@
-# Wakes the Vercel deployment every 5 minutes so it can check SimplifyJobs for
-# new internships. Vercel's free plan can't schedule anything more often than
-# every 15 minutes, so GitHub Actions (free and unlimited for public repos)
-# acts as the alarm clock. vercel.json keeps a 15-minute schedule as a backup.
+# Extra trigger for the checker. The primary 5-minute schedule is Upstash QStash
+# and vercel.json has a 15-minute backup; GitHub throttles scheduled workflows
+# on young repos heavily, so this one is best-effort. Overlapping triggers are
+# safe: the app takes a Redis lock and never alerts on the same listing twice.
 name: Check for new internships
 
 on:

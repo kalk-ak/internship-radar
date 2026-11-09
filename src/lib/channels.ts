@@ -28,16 +28,37 @@ export interface EmailMessage {
   unsubscribeUrl?: string;
 }
 
+function mailTransport(settings: Settings) {
+  const port = Number(settings.smtpPort || 465);
+  return nodemailer.createTransport({
+    host: settings.smtpHost || "smtp.gmail.com",
+    port,
+    secure: port === 465,
+    auth: { user: settings.emailUser, pass: (settings.emailPassword ?? "").replace(/\s+/g, "") },
+  });
+}
+
+/** Logs in to the SMTP server without sending anything, to catch a wrong app password on save. */
+export async function verifyEmailLogin(settings: Settings): Promise<SendResult> {
+  if (!settings.emailUser || !settings.emailPassword) return { ok: false, detail: "Enter both the Gmail address and the app password." };
+  try {
+    await mailTransport(settings).verify();
+    return { ok: true };
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    return {
+      ok: false,
+      detail: /535|Username and Password not accepted|BadCredentials/i.test(msg)
+        ? "Gmail rejected the login. Check the address, and use an app password (not your normal password)."
+        : msg,
+    };
+  }
+}
+
 export async function sendEmail(settings: Settings, msg: EmailMessage): Promise<SendResult> {
   if (!settings.emailUser || !settings.emailPassword) return { ok: false, detail: "Email sending is not configured" };
   try {
-    const port = Number(settings.smtpPort || 465);
-    const transport = nodemailer.createTransport({
-      host: settings.smtpHost || "smtp.gmail.com",
-      port,
-      secure: port === 465,
-      auth: { user: settings.emailUser, pass: settings.emailPassword.replace(/\s+/g, "") },
-    });
+    const transport = mailTransport(settings);
     const info = await transport.sendMail({
       from: settings.emailFrom || `Internship Radar <${settings.emailUser}>`,
       to: msg.to,

@@ -4,7 +4,7 @@ Get a message when top companies open SWE internships.
 
 Internship Radar watches the [SimplifyJobs](https://github.com/SimplifyJobs) internship list every 5 minutes. When a FAANG+ company, top quant firm or AI lab posts a new role, it alerts subscribers on **email, Telegram, Discord or WhatsApp** and posts it to **Instagram**. Anyone can sign up from the public page and pick their own channels. A password-protected admin dashboard lets you manage everything.
 
-It runs entirely on free tiers: Vercel Hobby, Upstash Redis free, and GitHub Actions.
+It runs entirely on free tiers: Vercel Hobby, Upstash Redis and QStash, and GitHub Actions.
 
 **Live:** <https://internship-radar-xi.vercel.app>
 
@@ -31,8 +31,9 @@ It runs entirely on free tiers: Vercel Hobby, Upstash Redis free, and GitHub Act
 
 ```mermaid
 flowchart LR
-  GH["GitHub Actions<br/>every 5 min"] -->|POST /api/check| API
+  QS["Upstash QStash<br/>every 5 min"] -->|signed POST /api/check| API
   VS["Vercel Schedule<br/>every 15 min backup"] -->|POST /api/check| API
+  GH["GitHub Actions<br/>best-effort extra"] -->|POST /api/check| API
   subgraph Vercel
     API["/api/check"] --> R[(Upstash Redis)]
   end
@@ -50,7 +51,7 @@ flowchart LR
 4. New roles are matched against each subscriber's preferences and grouped by company, so a 20-role drop from Google is one message: *"🔥 Google just opened 20 SWE internship roles"*.
 5. Each confirmed channel gets a formatted alert, and every delivery is logged for the admin page.
 
-Why GitHub Actions? Vercel's free plan only allows cron jobs once a day, and its newer Schedules feature only every 15 minutes. GitHub Actions is free and unlimited for public repos and supports 5-minute schedules. GitHub can delay scheduled runs under heavy load, so the Vercel schedule acts as a backup.
+Why three triggers? Vercel's free plan only allows cron jobs once a day, and its newer Schedules feature only every 15 minutes. Upstash QStash's free plan (1,000 messages a day) handles the 5-minute schedule; a 5-minute cron uses 288 a day. Its requests are verified with QStash's signing keys. The Vercel schedule is a backup. GitHub Actions also has a 5-minute workflow, but GitHub throttles schedules on young repos heavily (in practice a run every few hours), so treat it as a bonus. Overlapping triggers are harmless: a Redis lock and the seen-set stop duplicate alerts.
 
 ## Channels
 
@@ -109,13 +110,22 @@ Instagram doesn't let bots DM people who haven't messaged the account in the las
 
 1. **Fork** this repo. Keep it public so GitHub Actions minutes stay free.
 2. **Import it on Vercel** (<https://vercel.com/new>). The Hobby plan is enough.
-3. **Add Redis.** In the Vercel project go to **Storage → Create Database → Upstash for Redis** (free plan) and connect it to the project. This adds the `KV_REST_API_*` variables.
+3. **Add Redis and QStash.** In the Vercel project go to **Storage**, add **Upstash for Redis** and **Upstash QStash** (both free plans), and connect them to the project. This adds the `KV_REST_API_*` and `QSTASH_*` variables.
 4. **Add environment variables** under **Settings → Environment Variables**, each a random string (`openssl rand -base64 32`):
    - `APP_SECRET` signs admin sessions and encrypts stored credentials
    - `CRON_SECRET` authenticates the scheduler
    - `ADMIN_PASSWORD` is the dashboard password
 5. **Redeploy**, then open `/admin`, sign in, and set up your channels.
-6. **Turn on the 5-minute trigger.** In your GitHub repo:
+6. **Turn on the 5-minute trigger** by creating a QStash schedule (`QSTASH_TOKEN` is in your Vercel environment variables):
+
+   ```bash
+   curl -X POST "https://qstash.upstash.io/v2/schedules/https://your-app.vercel.app/api/check" \
+     -H "Authorization: Bearer $QSTASH_TOKEN" \
+     -H "Upstash-Cron: */5 * * * *" \
+     -H "Upstash-Retries: 1"
+   ```
+
+7. **Optional: GitHub Actions as an extra trigger.**
 
    ```bash
    gh variable set APP_URL --body "https://your-app.vercel.app"
@@ -133,6 +143,7 @@ The first check records everything currently listed as already seen. Alerts star
 | `CRON_SECRET` | yes | Bearer token for `/api/check`. Also sent by Vercel Schedules. |
 | `ADMIN_PASSWORD` | yes | Password for `/admin`. |
 | `KV_REST_API_URL`, `KV_REST_API_TOKEN` | yes | Upstash Redis REST credentials. `UPSTASH_REDIS_REST_*` also works. |
+| `QSTASH_CURRENT_SIGNING_KEY`, `QSTASH_NEXT_SIGNING_KEY` | yes | Verify requests from the QStash 5-minute schedule. Added by the QStash integration. |
 | `APP_URL` | no | Public URL. Defaults to the Vercel production domain. |
 | `GITHUB_TOKEN` | no | A token with no scopes, used for the star count and repo stats on the developer page. It raises GitHub's limit from 60 to 5,000 requests an hour. Stats are cached for 10 minutes either way. |
 | `SIMPLIFY_REPO`, `SIMPLIFY_BRANCH` | no | Pin a source repo instead of auto-detecting. Default branch is `dev`. |

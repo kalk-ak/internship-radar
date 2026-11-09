@@ -17,7 +17,7 @@ export const KEYS = {
 };
 
 const REPO_RECHECK_MS = 12 * 60 * 60 * 1000;
-const SCHEDULED = ["github-actions", "vercel-schedule"];
+const SCHEDULED = ["qstash", "github-actions", "vercel-schedule"];
 export const BOARD_WINDOW_MS = 45 * 24 * 60 * 60 * 1000;
 const BOARD_LIMIT = 1000;
 

@@ -271,6 +271,32 @@ export async function resendEmailVerification(sub: Subscriber) {
   return report;
 }
 
+/** Marks an existing subscriber's email as confirmed (admin vouching for their own address). */
+export async function markEmailVerified(address: string) {
+  const id = await kv().get<string>(idx.email(address));
+  const sub = id ? await getSubscriber(id) : null;
+  if (!sub?.channels.email) return null;
+  if (sub.channels.email.verifyToken) await kv().del(idx.emailVerify(sub.channels.email.verifyToken));
+  sub.channels.email = { address: sub.channels.email.address, verified: true };
+  await saveSubscriber(sub);
+  return sub;
+}
+
+/** After email is switched on, send confirmations to everyone who signed up while it was off. */
+export async function sendPendingEmailVerifications(limit = 100) {
+  const settings = await getSettings();
+  if (!channelStatus(settings).email) return 0;
+  let sent = 0;
+  for (const sub of await listSubscribers()) {
+    if (sent >= limit) break;
+    if (!sub.channels.email || sub.channels.email.verified) continue;
+    const report = await sendEmailVerification(sub, settings);
+    await saveSubscriber(sub);
+    if (report.status !== "failed") sent++;
+  }
+  return sent;
+}
+
 export async function verifyEmailToken(token: string) {
   if (!/^[\w-]{20,64}$/.test(token)) return null;
   const id = await kv().get<string>(idx.emailVerify(token));

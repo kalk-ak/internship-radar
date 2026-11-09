@@ -2,12 +2,20 @@
 
 import { revalidatePath } from "next/cache";
 import { checkPassword, endAdminSession, rateLimit, requireAdmin, startAdminSession } from "@/lib/auth";
-import { instagramMe, telegramApi } from "@/lib/channels";
+import { instagramMe, telegramApi, verifyEmailLogin } from "@/lib/channels";
 import { runCheck } from "@/lib/checker";
 import { readChannels, readPrefs, str } from "@/lib/forms";
 import { sendTestAlert } from "@/lib/notify";
 import { getSettings, saveSettings, type Settings } from "@/lib/settings";
-import { createSubscriber, deleteSubscriber, getSubscriber, InputError, saveSubscriber } from "@/lib/subscribers";
+import {
+  createSubscriber,
+  deleteSubscriber,
+  getSubscriber,
+  InputError,
+  markEmailVerified,
+  saveSubscriber,
+  sendPendingEmailVerifications,
+} from "@/lib/subscribers";
 import { connectTelegramBot } from "@/lib/telegram";
 import type { FormState } from "../actions";
 
@@ -57,10 +65,25 @@ export async function saveChannelSettingsAction(section: Section, _prev: FormSta
       patch = clear
         ? { emailUser: "", emailPassword: "", smtpHost: "", smtpPort: "", emailFrom: "" }
         : { emailUser: val("emailUser"), emailPassword: val("emailPassword") || undefined, smtpHost: val("smtpHost") ?? "", smtpPort: val("smtpPort") ?? "", emailFrom: val("emailFrom") ?? "" };
+      if (!clear) {
+        // Test the login before saving, so a wrong app password shows up now, not at the first alert.
+        const login = await verifyEmailLogin({ ...(await getSettings()), ...Object.fromEntries(Object.entries(patch).filter(([, v]) => v !== undefined && v !== "")) });
+        if (!login.ok) return { ok: false, message: login.detail };
+      }
       await saveSettings(patch);
-      if (!clear && form.get("subscribeSelf") === "on" && patch.emailUser) {
-        await createSubscriber("Admin", { email: patch.emailUser }, { categories: ["Software"], hotOnly: true }, { trustEmail: true }).catch(() => null);
-        message = `Saved. ${patch.emailUser} is subscribed to hot SWE alerts.`;
+      if (!clear) {
+        const notes = ["Saved. Gmail accepted the login."];
+        if (form.get("subscribeSelf") === "on" && patch.emailUser) {
+          const address = patch.emailUser.toLowerCase();
+          const existing = await markEmailVerified(address);
+          const created = existing
+            ? null
+            : await createSubscriber("Admin", { email: address }, { categories: ["Software"], hotOnly: true }, { trustEmail: true }).catch(() => null);
+          if (existing || created?.subscriber) notes.push(`${address} is subscribed to hot SWE alerts.`);
+        }
+        const pending = await sendPendingEmailVerifications();
+        if (pending) notes.push(`Sent ${pending} confirmation email${pending === 1 ? "" : "s"} to people who signed up earlier.`);
+        message = notes.join(" ");
       }
     }
     if (section === "telegram") {

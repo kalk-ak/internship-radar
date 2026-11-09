@@ -59,7 +59,7 @@ const TOC = [
 
 const LANGUAGE_COLORS: Record<string, string> = { TypeScript: "#7aa2ff", CSS: "#c39bff", JavaScript: "#f2d36b" };
 
-const DIAGRAM = `github actions            vercel function               internship list
+const DIAGRAM = `qstash (every 5m)         vercel function               internship list
 */5 * * * *  ──POST──▶  /api/check  ──If-None-Match──▶  README.md
                             │                            listings.json
                             │◀─── 304 Not Modified ──────┘   done in ~50 ms
@@ -386,8 +386,8 @@ export default function DevPage() {
               <Heading id="how-it-works">How it works</Heading>
               <ol>
                 <li>
-                  GitHub Actions calls <code>POST /api/check</code> every 5 minutes. A Vercel schedule calls it every 15 minutes as a
-                  backup.
+                  An Upstash QStash schedule calls <code>POST /api/check</code> every 5 minutes with a signed request. A Vercel
+                  schedule calls it every 15 minutes as a backup.
                 </li>
                 <li>
                   The checker sends conditional requests for the internship list&apos;s <code>README.md</code> and the{" "}
