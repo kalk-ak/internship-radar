@@ -93,7 +93,7 @@ export interface SetupReport {
 async function sendEmailVerification(sub: Subscriber, settings: Settings): Promise<SetupReport> {
   const email = sub.channels.email!;
   if (!channelStatus(settings).email) {
-    return { channel: "email", status: "pending", message: "Email sending isn't configured yet. We'll confirm your address once it is." };
+    return { channel: "email", status: "pending", message: "We'll send you a confirmation email as soon as email alerts are switched on." };
   }
   email.verifyToken = randomToken();
   await kv().set(idx.emailVerify(email.verifyToken), sub.id, { ex: 60 * 60 * 24 * 7 });
@@ -179,8 +179,8 @@ export async function applyChannels(
       channel: "telegram",
       status: "pending",
       message: settings.telegramBotUsername
-        ? "Open the Telegram link and press Start to connect."
-        : "Telegram isn't configured yet. Come back to your manage page once it is.",
+        ? "Tap Open Telegram, then press Start in the chat."
+        : "Telegram alerts aren't switched on yet. We'll connect you once they are.",
     });
   } else if (input.telegram === false && sub.channels.telegram) {
     const tg = sub.channels.telegram;

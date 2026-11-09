@@ -15,7 +15,7 @@ export function SetupResults({ reports, telegramUrl }: { reports: SetupReport[];
       {reports.map((r) => (
         <li key={r.channel} className="flex flex-col gap-1 rounded-lg border border-rule bg-panel px-4 py-3 sm:flex-row sm:items-center sm:gap-3">
           <span className="w-24 shrink-0 font-semibold">{CHANNEL_NAMES[r.channel] ?? r.channel}</span>
-          <span className={`w-fit rounded-full px-2 py-0.5 text-xs font-semibold ${TONE[r.status].cls}`}>{TONE[r.status].mark}</span>
+          <span className={`w-fit shrink-0 whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-semibold ${TONE[r.status].cls}`}>{TONE[r.status].mark}</span>
           <span className="text-sm text-ink-soft">{r.message}</span>
           {r.channel === "telegram" && telegramUrl && (
             <a href={telegramUrl} target="_blank" rel="noopener noreferrer" className="w-fit rounded-lg bg-accent px-3 py-1.5 text-sm font-semibold text-accent-ink hover:bg-accent-hover sm:ml-auto">

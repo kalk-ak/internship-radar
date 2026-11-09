@@ -1,18 +1,18 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { dayLabel } from "@/lib/heat";
 import type { Role } from "@/lib/types";
 import { CATEGORY_STYLE } from "@/lib/ui";
 import { TimeAgo } from "./time-ago";
 
 const TABS = [
-  { value: "Software", label: "software", dot: CATEGORY_STYLE.Software.dot },
-  { value: "AI/ML/Data", label: "ai / ml", dot: CATEGORY_STYLE["AI/ML/Data"].dot },
-  { value: "Quant", label: "quant", dot: CATEGORY_STYLE.Quant.dot },
-  { value: "Hardware", label: "hardware", dot: CATEGORY_STYLE.Hardware.dot },
-  { value: "Product", label: "product", dot: CATEGORY_STYLE.Product.dot },
-  { value: "all", label: "all", dot: "bg-ink-soft" },
+  { value: "Software", label: "Software" },
+  { value: "AI/ML/Data", label: "AI & ML" },
+  { value: "Quant", label: "Quant" },
+  { value: "Hardware", label: "Hardware" },
+  { value: "Product", label: "Product" },
+  { value: "all", label: "All roles" },
 ] as const;
 
 type Tab = (typeof TABS)[number]["value"];
@@ -24,16 +24,20 @@ interface Props {
 }
 
 function location(role: Role) {
-  if (role.locations.length === 0) return "location not listed";
-  return role.locations.length > 1 ? `${role.locations[0]} +${role.locations.length - 1}` : role.locations[0];
+  if (role.locations.length === 0) return "Location not listed";
+  return role.locations.length > 1 ? `${role.locations[0]} + ${role.locations.length - 1} more` : role.locations[0];
 }
 
-function notes(role: Role) {
-  return [
-    role.terms.join(" / "),
-    role.sponsorship === "Does Not Offer Sponsorship" ? "no sponsorship" : "",
-    role.sponsorship === "U.S. Citizenship is Required" ? "US citizens only" : "",
-  ].filter(Boolean);
+function Tag({ children, tone = "default" }: { children: ReactNode; tone?: "default" | "warn" }) {
+  return (
+    <span
+      className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium ${
+        tone === "warn" ? "bg-bad-wash text-bad" : "bg-wash text-ink-soft"
+      }`}
+    >
+      {children}
+    </span>
+  );
 }
 
 export function Board({ initial, initialQuery }: Props) {
@@ -67,14 +71,13 @@ export function Board({ initial, initialQuery }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [category, hotOnly, q]);
 
-  // "/" focuses search, like most developer tools.
+  // "/" focuses the search box: a shortcut for keyboard users, never required.
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       const t = e.target as HTMLElement;
       if (e.key !== "/" || e.metaKey || e.ctrlKey || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) || t.isContentEditable) return;
       e.preventDefault();
       search.current?.focus();
-      search.current?.scrollIntoView({ block: "center" });
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -92,112 +95,100 @@ export function Board({ initial, initialQuery }: Props) {
 
   return (
     <div>
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div role="tablist" aria-label="Role type" className="font-data -mx-4 flex gap-1 overflow-x-auto px-4 text-[0.8rem] lg:mx-0 lg:px-0">
+      <div className="flex flex-col gap-4 rounded-xl border border-rule bg-panel p-3 lg:flex-row lg:items-center lg:justify-between">
+        <div role="tablist" aria-label="Type of role" className="-mx-1 flex gap-1 overflow-x-auto px-1">
           {TABS.map((t) => (
             <button
               key={t.value}
               role="tab"
               aria-selected={category === t.value}
               onClick={() => setCategory(t.value)}
-              className={`flex shrink-0 items-center gap-2 rounded-md border px-3 py-1.5 transition-colors ${
-                category === t.value ? "border-rule-strong bg-wash text-ink" : "border-transparent text-muted hover:text-ink"
+              className={`shrink-0 rounded-lg px-3.5 py-2 text-sm font-medium transition-colors ${
+                category === t.value ? "bg-accent text-accent-ink" : "text-ink-soft hover:bg-wash hover:text-ink"
               }`}
             >
-              <span className={`h-1.5 w-1.5 rounded-full ${t.dot}`} aria-hidden />
               {t.label}
             </button>
           ))}
         </div>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <label className="font-data flex cursor-pointer items-center gap-2.5 text-[0.8rem] text-ink-soft">
+          <label className="flex cursor-pointer items-center gap-2.5 px-1 text-sm text-ink-soft">
             <span className="relative inline-flex h-5 w-9 shrink-0 items-center">
               <input type="checkbox" className="peer sr-only" checked={hotOnly} onChange={(e) => setHotOnly(e.target.checked)} />
               <span className="absolute inset-0 rounded-full bg-rule-strong transition-colors peer-checked:bg-accent peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-accent" />
               <span className="absolute left-0.5 h-4 w-4 rounded-full bg-ink transition-transform peer-checked:translate-x-4 peer-checked:bg-accent-ink" />
             </span>
-            top companies only
+            Top companies only
           </label>
-          <div className="relative">
-            <input
-              ref={search}
-              type="search"
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder="search company or title"
-              aria-label="Search roles"
-              className="font-data w-full rounded-md border border-rule-strong bg-panel py-2 pl-3 pr-9 text-[0.8rem] text-ink focus:border-accent focus:outline-none sm:w-64"
-            />
-            {!q && (
-              <kbd className="font-data pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 rounded border border-rule-strong px-1.5 text-[0.7rem] text-muted">
-                /
-              </kbd>
-            )}
-          </div>
+          <input
+            ref={search}
+            type="search"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Search by company or role"
+            aria-label="Search roles"
+            className="w-full rounded-lg border border-rule-strong bg-paper px-3.5 py-2 text-sm text-ink focus:border-accent focus:outline-none sm:w-64"
+          />
         </div>
       </div>
 
-      <p className="font-data mt-5 text-[0.78rem] text-muted" aria-live="polite">
-        {loading ? "loading…" : `${data.total.toLocaleString("en-US")} ${data.total === 1 ? "role" : "roles"}`}
+      <p className="mt-5 text-sm text-muted" aria-live="polite">
+        {loading
+          ? "Loading roles…"
+          : data.total === 0
+            ? "No roles found"
+            : `Showing ${Math.min(data.roles.length, data.total).toLocaleString("en-US")} of ${data.total.toLocaleString("en-US")} ${data.total === 1 ? "role" : "roles"}`}
       </p>
 
       {groups.length === 0 && !loading ? (
         <div className="mt-6 rounded-xl border border-dashed border-rule-strong px-6 py-12 text-center">
           <p className="font-semibold text-ink">No roles match these filters.</p>
-          <p className="mt-1 text-sm text-muted">Turn off “top companies only” or clear the search to see more.</p>
+          <p className="mt-1 text-sm text-muted">Try turning off “Top companies only” or clearing the search.</p>
         </div>
       ) : (
-        <div className={`mt-3 transition-opacity ${loading ? "opacity-50" : ""}`}>
+        <div className={`transition-opacity ${loading ? "opacity-50" : ""}`}>
           {groups.map((g) => (
-            <section key={g.label} aria-label={g.label} className="mt-6 first:mt-2">
-              <h3 className="font-data sticky top-[57px] z-10 flex items-baseline justify-between bg-paper/90 py-2 text-[0.75rem] text-muted backdrop-blur">
-                <span>
-                  <span className="text-accent">{"//"}</span> {g.label.toLowerCase()}
-                </span>
-                <span>
-                  {g.roles.length} {g.roles.length === 1 ? "role" : "roles"}
-                </span>
-              </h3>
+            <section key={g.label} aria-label={`Posted ${g.label}`} className="mt-6">
+              <h3 className="sticky top-[61px] z-10 bg-paper/90 py-2 text-sm font-semibold text-ink-soft backdrop-blur">{g.label}</h3>
               <ul className="overflow-hidden rounded-xl border border-rule bg-panel">
                 {g.roles.map((r) => {
                   const cat = CATEGORY_STYLE[r.category];
                   return (
-                    <li
-                      key={r.id}
-                      className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-1 border-t border-rule px-4 py-3.5 first:border-t-0 transition-colors hover:bg-wash sm:grid-cols-[3.5rem_12rem_minmax(0,1fr)_auto]"
-                    >
-                      <TimeAgo at={r.postedAt} short className="font-data hidden text-[0.78rem] sm:block" />
-                      <div className="font-data col-span-2 flex min-w-0 items-center gap-2 text-[0.85rem] font-semibold text-ink sm:col-span-1">
-                        <span className="truncate">{r.company}</span>
-                        {r.hot && (
-                          <span className="shrink-0 rounded bg-hot-wash px-1.5 text-[0.65rem] font-medium text-hot-text" title="Top company">
-                            top
-                          </span>
-                        )}
-                      </div>
-                      <div className="min-w-0">
-                        <p className="font-medium leading-snug text-ink">{r.title}</p>
-                        <p className="font-data mt-0.5 flex flex-wrap items-center gap-x-2 text-[0.72rem] text-muted">
-                          <span className={`inline-flex items-center gap-1.5 ${cat.text}`}>
-                            <span className={`h-1.5 w-1.5 rounded-full ${cat.dot}`} aria-hidden />
-                            {cat.short}
-                          </span>
-                          {[location(r), ...notes(r).map((n) => n.toLowerCase())].map((part) => (
-                            <span key={part} className="before:mr-2 before:text-rule-strong before:content-['/']">
-                              {part}
-                            </span>
-                          ))}
-                          <TimeAgo at={r.postedAt} short className="sm:hidden" />
+                    <li key={r.id} className="flex flex-col gap-3 border-t border-rule px-5 py-4 first:border-t-0 sm:flex-row sm:items-center sm:gap-6">
+                      <div className="min-w-0 flex-1">
+                        <p className="flex flex-wrap items-center gap-2">
+                          <span className="font-semibold text-ink">{r.company}</span>
+                          {r.hot && !hotOnly && <span className="rounded-md bg-hot-wash px-2 py-0.5 text-xs font-medium text-hot-text">Top company</span>}
                         </p>
+                        <p className="mt-0.5 text-ink-soft">{r.title}</p>
+                        <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                          <Tag>{location(r)}</Tag>
+                          {r.terms.map((t) => (
+                            <Tag key={t}>{t}</Tag>
+                          ))}
+                          {category === "all" && (
+                            <Tag>
+                              <span className={`mr-1.5 h-1.5 w-1.5 rounded-full ${cat.dot}`} aria-hidden />
+                              {cat.label}
+                            </Tag>
+                          )}
+                          {r.sponsorship === "Does Not Offer Sponsorship" && <Tag tone="warn">No visa sponsorship</Tag>}
+                          {r.sponsorship === "U.S. Citizenship is Required" && <Tag tone="warn">US citizens only</Tag>}
+                        </div>
                       </div>
-                      <a
-                        href={r.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="rounded-md border border-rule-strong px-3 py-1.5 text-center text-sm font-semibold text-ink transition-colors hover:border-accent hover:bg-accent hover:text-accent-ink"
-                      >
-                        Apply<span className="sr-only"> to {r.title} at {r.company} (opens in a new tab)</span>
-                      </a>
+                      <div className="flex items-center justify-between gap-4 sm:flex-col sm:items-end sm:justify-center sm:gap-2">
+                        <span className="text-sm text-muted">
+                          Posted <TimeAgo at={r.postedAt} colored={false} />
+                        </span>
+                        <a
+                          href={r.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-accent-ink transition-colors hover:bg-accent-hover"
+                        >
+                          Apply<span className="sr-only"> to {r.title} at {r.company} (opens in a new tab)</span>
+                        </a>
+                      </div>
                     </li>
                   );
                 })}
@@ -211,9 +202,9 @@ export function Board({ initial, initialQuery }: Props) {
         <button
           onClick={() => load(data.roles.length)}
           disabled={loading}
-          className="font-data mt-6 w-full rounded-lg border border-rule-strong bg-panel py-3 text-[0.8rem] text-ink-soft transition-colors hover:border-ink-soft hover:text-ink disabled:opacity-50"
+          className="mt-6 w-full rounded-lg border border-rule-strong bg-panel py-3 text-sm font-medium text-ink-soft transition-colors hover:border-ink-soft hover:text-ink disabled:opacity-50"
         >
-          {loading ? "loading…" : `load ${Math.min(PAGE, data.total - data.roles.length)} more`}
+          {loading ? "Loading…" : `Show ${Math.min(PAGE, data.total - data.roles.length)} more roles`}
         </button>
       )}
     </div>

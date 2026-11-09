@@ -126,10 +126,10 @@ async function HeroMeta() {
         <Badge label="stars" value={compactNumber(repo?.stars ?? 0)} />
       </div>
       {board && (
-        <p className="font-data text-[0.8rem] text-muted">
-          <span className="text-ink">{(board.totals.byCategory.Software ?? 0).toLocaleString("en-US")}</span> open swe internships right
-          now, <span className="text-ink">{board.totals.hot.toLocaleString("en-US")}</span> at{" "}
-          <span className="text-ink">{board.totals.hotCompanies}</span> top companies
+        <p className="text-sm text-muted">
+          Right now: <span className="font-semibold text-ink">{(board.totals.byCategory.Software ?? 0).toLocaleString("en-US")}</span> open
+          software engineering internships, <span className="font-semibold text-ink">{board.totals.hot.toLocaleString("en-US")}</span> at{" "}
+          <span className="font-semibold text-ink">{board.totals.hotCompanies}</span> top companies.
         </p>
       )}
     </>
@@ -200,7 +200,7 @@ async function RepoCard() {
             {repo.languages.map((l) => (
               <li key={l.name} className="flex items-center gap-1.5 text-ink-soft">
                 <span className="h-1.5 w-1.5 rounded-full" style={{ background: LANGUAGE_COLORS[l.name] ?? "#7c859e" }} aria-hidden />
-                {l.name.toLowerCase()} <span className="text-muted">{l.percent}%</span>
+                {l.name} <span className="text-muted">{l.percent}%</span>
               </li>
             ))}
           </ul>
@@ -221,10 +221,10 @@ async function ActivityCard() {
     <section aria-labelledby="activity-title">
       <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
         <h2 id="activity-title" className="font-head text-xl font-bold text-ink">
-          {total.toLocaleString("en-US")} SWE internships posted this year
+          {total.toLocaleString("en-US")} software internships posted in the past year
         </h2>
-        <p className="font-data text-[0.75rem] text-muted">
-          <span className="text-accent">{hot.toLocaleString("en-US")}</span> at top companies
+        <p className="text-sm text-muted">
+          <span className="font-semibold text-accent">{hot.toLocaleString("en-US")}</span> at top companies
         </p>
       </div>
       <div className="rounded-xl border border-rule bg-panel p-5">
@@ -248,9 +248,9 @@ async function HiringTable() {
       <table>
         <thead>
           <tr>
-            <th>company</th>
-            <th>open swe roles</th>
-            <th>latest posting</th>
+            <th>Company</th>
+            <th>Open software roles</th>
+            <th>Latest posting</th>
           </tr>
         </thead>
         <tbody>
@@ -317,9 +317,6 @@ export default function DevPage() {
           <div className="bg-grid pointer-events-none absolute inset-0 [mask-image:radial-gradient(ellipse_at_30%_20%,black,transparent_70%)]" aria-hidden />
           <div className="relative mx-auto grid max-w-6xl gap-10 px-4 pb-16 pt-14 sm:px-6 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-center lg:pt-20">
             <div className="flex flex-col gap-6">
-              <p className="font-data text-[0.8rem] text-muted">
-                <span className="text-accent">~/</span>developers
-              </p>
               <h1 className="font-head text-[2.2rem] font-bold leading-[1.06] text-ink sm:text-5xl">
                 Free SWE internship alerts. Open source, built to fork.
               </h1>
@@ -352,14 +349,14 @@ export default function DevPage() {
           </Suspense>
 
           <div className="mt-14 grid grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-16">
-            <nav aria-label="On this page" className="font-data hidden text-[0.78rem] lg:block">
+            <nav aria-label="On this page" className="hidden text-sm lg:block">
               <div className="sticky top-24">
-                <p className="mb-3 text-muted">on this page</p>
+                <p className="mb-3 font-semibold text-ink">On this page</p>
                 <ul className="space-y-2 border-l border-rule">
                   {TOC.map(([id, label]) => (
                     <li key={id}>
                       <a href={`#${id}`} className="-ml-px block border-l border-transparent pl-4 text-ink-soft transition-colors hover:border-accent hover:text-ink">
-                        {label.toLowerCase()}
+                        {label}
                       </a>
                     </li>
                   ))}
@@ -405,9 +402,9 @@ export default function DevPage() {
               <table>
                 <thead>
                   <tr>
-                    <th>channel</th>
-                    <th>how you connect</th>
-                    <th>notes</th>
+                    <th>Channel</th>
+                    <th>How you connect</th>
+                    <th>Notes</th>
                   </tr>
                 </thead>
                 <tbody>

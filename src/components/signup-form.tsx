@@ -11,13 +11,14 @@ export function SignupForm({ config }: { config: ChannelConfig }) {
   if (state.ok) {
     return (
       <div className="space-y-5" role="status">
-        <p className="font-head text-3xl font-bold">You&apos;re on the list.</p>
+        <p className="font-head text-3xl font-bold">You&apos;re signed up.</p>
+        <p className="text-ink-soft">Finish any steps below and you&apos;ll start getting alerts.</p>
         <SetupResults reports={state.reports ?? []} telegramUrl={state.telegramUrl} />
         {state.manageUrl && (
           <div className="rounded-xl bg-wash p-4 text-sm">
-            <p className="font-semibold">Bookmark your manage page</p>
+            <p className="font-semibold">Save this link</p>
             <p className="mt-1 text-ink-soft">
-              Use it to add channels, change what you hear about, or unsubscribe. Every alert links to it too.
+              Use it to change your alerts or unsubscribe. Every alert includes it too.
             </p>
             <a href={state.manageUrl} className="mt-2 inline-block break-all font-semibold underline underline-offset-2">
               {state.manageUrl}
@@ -43,7 +44,7 @@ export function SignupForm({ config }: { config: ChannelConfig }) {
         disabled={pending}
         className="w-full rounded-xl bg-accent px-6 py-3.5 text-base font-semibold text-accent-ink transition-colors hover:bg-accent-hover disabled:opacity-60 sm:w-auto"
       >
-        {pending ? "Setting up your alerts…" : "Start alerts"}
+        {pending ? "Setting up your alerts…" : "Start getting alerts"}
       </button>
     </form>
   );

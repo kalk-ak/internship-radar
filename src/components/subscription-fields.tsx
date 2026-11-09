@@ -22,7 +22,7 @@ export interface FieldDefaults {
 
 const CATEGORY_TEXT: Record<Category, string> = {
   Software: "Software engineering",
-  "AI/ML/Data": "AI, ML and data science",
+  "AI/ML/Data": "AI, machine learning and data",
   Quant: "Quant and trading",
   Hardware: "Hardware and embedded",
   Product: "Product management",
@@ -110,26 +110,38 @@ export function SubscriptionFields({
   const chip = (k: keyof NonNullable<typeof statuses>) =>
     statuses && statuses[k] !== undefined ? <StatusChip verified={Boolean(statuses[k])} /> : null;
 
+  // Numbered steps only when the name field is shown (signup); manage pages reuse the same fields.
+  const step = (n: number, text: string) => (
+    <span className="flex items-center gap-3">
+      {showName && (
+        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-hot-wash text-xs font-bold text-accent" aria-hidden>
+          {n}
+        </span>
+      )}
+      {text}
+    </span>
+  );
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-9">
       {showName && (
         <div>
-          <label htmlFor="name" className="mb-1.5 block font-semibold">
-            Your name
+          <label htmlFor="name" className="mb-2 block font-semibold text-ink">
+            {step(1, "What should we call you?")}
           </label>
-          <input id="name" name="name" required maxLength={60} defaultValue={defaults.name} autoComplete="given-name" className={inputClass} placeholder="Alex" />
+          <input id="name" name="name" required maxLength={60} defaultValue={defaults.name} autoComplete="given-name" className={inputClass} placeholder="Your first name" />
         </div>
       )}
 
       <fieldset>
-        <legend className="mb-1 font-semibold">Where should alerts go?</legend>
-        <p className="mb-3 text-sm text-muted">Pick one or more. Each one gets every alert.</p>
+        <legend className="mb-1 font-semibold text-ink">{step(2, "Where should we send alerts?")}</legend>
+        <p className={`mb-3 text-sm text-muted ${showName ? "pl-9" : ""}`}>Pick one or more.</p>
         <div className="space-y-2.5">
           <ChannelRow
             id="email"
             icon="email"
             title="Email"
-            hint={config.emailReady ? "We'll send a confirmation link first." : "Saved now, confirmed once email sending is switched on."}
+            hint={config.emailReady ? "We'll email you a link to confirm your address." : "We'll confirm your address once email alerts are switched on."}
             defaultOn={Boolean(defaults.email) || !statuses}
             status={chip("email")}
           >
@@ -140,7 +152,7 @@ export function SubscriptionFields({
             id="telegram"
             icon="telegram"
             title="Telegram"
-            hint={config.telegramReady ? "After saving, open our bot and press Start." : "Our Telegram bot isn't switched on yet. Saving now connects you later."}
+            hint={config.telegramReady ? "After you save, tap the link to open our bot and press Start." : "Coming soon. Tick it now and we'll connect you once it's ready."}
             defaultOn={Boolean(defaults.telegram)}
             status={chip("telegram")}
           />
@@ -149,13 +161,14 @@ export function SubscriptionFields({
             id="discord"
             icon="discord"
             title="Discord"
-            hint="Post alerts into a channel on your server, or your study group's."
+            hint="Send alerts to a channel in your Discord server."
             defaultOn={Boolean(defaults.discordWebhook)}
             status={chip("discord")}
           >
             <input name="discordWebhook" type="url" defaultValue={defaults.discordWebhook} placeholder="https://discord.com/api/webhooks/…" aria-label="Discord webhook URL" className={inputClass} />
             <p className="text-sm text-muted">
-              In Discord: channel settings, Integrations, Webhooks, New Webhook, then Copy Webhook URL. We&apos;ll post a test message.
+              To get this link: in Discord, open the channel&apos;s settings, choose Integrations, then Webhooks, then New Webhook, and
+              click Copy Webhook URL.
             </p>
           </ChannelRow>
 
@@ -163,7 +176,7 @@ export function SubscriptionFields({
             id="whatsapp"
             icon="whatsapp"
             title="WhatsApp"
-            hint={config.whatsappCloud ? "We'll send a test message to confirm." : "Uses the free CallMeBot service. You'll need a key, which takes a minute to get."}
+            hint={config.whatsappCloud ? "We'll send a test message to confirm your number." : "Uses the free CallMeBot service, which needs a quick one-time setup."}
             defaultOn={Boolean(defaults.whatsappPhone)}
             status={chip("whatsapp")}
           >
@@ -173,16 +186,16 @@ export function SubscriptionFields({
                 <input
                   name="callmebotKey"
                   inputMode="numeric"
-                  placeholder={defaults.hasCallmebotKey ? "Key saved. Paste a new one to replace it" : "CallMeBot API key"}
-                  aria-label="CallMeBot API key"
+                  placeholder={defaults.hasCallmebotKey ? "Key saved. Paste a new one to replace it" : "Your CallMeBot key"}
+                  aria-label="CallMeBot key"
                   className={inputClass}
                 />
                 <p className="text-sm text-muted">
-                  Get your key by following step 1 on{" "}
+                  To get a free key, follow step 1 on{" "}
                   <a className="font-medium text-ink underline underline-offset-2" href="https://www.callmebot.com/blog/free-api-whatsapp-messages/" target="_blank" rel="noopener noreferrer">
-                    CallMeBot&apos;s WhatsApp page
+                    this CallMeBot page
                   </a>
-                  . They reply with your key on WhatsApp.
+                  . They&apos;ll send the key to you on WhatsApp.
                 </p>
               </>
             )}
@@ -193,15 +206,15 @@ export function SubscriptionFields({
             On Instagram? Follow{" "}
             <a href={`https://instagram.com/${config.instagramHandle}`} target="_blank" rel="noopener noreferrer" className="font-semibold text-ink underline underline-offset-2">
               @{config.instagramHandle}
-            </a>
-            . Every hot SWE drop gets posted there.
+            </a>{" "}
+            to see new roles in your feed.
           </p>
         )}
       </fieldset>
 
       <fieldset>
-        <legend className="mb-1 font-semibold">What should we alert you about?</legend>
-        <p className="mb-3 text-sm text-muted">Software includes roles with software titles in other categories, like ML infrastructure.</p>
+        <legend className="mb-1 font-semibold text-ink">{step(showName ? 3 : 2, "What kind of roles?")}</legend>
+        <p className={`mb-3 text-sm text-muted ${showName ? "pl-9" : ""}`}>Choose as many as you like.</p>
         <div className="grid gap-2 sm:grid-cols-2">
           {CATEGORIES.map((c) => (
             <label key={c} className="flex cursor-pointer items-center gap-2.5 rounded-lg border border-rule bg-paper/40 px-3.5 py-2.5 text-[0.95rem] has-[:checked]:border-accent/50 has-[:checked]:bg-wash">
@@ -210,21 +223,22 @@ export function SubscriptionFields({
             </label>
           ))}
         </div>
-        <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-lg border border-rule bg-panel px-3.5 py-3 has-[:checked]:border-accent/50 has-[:checked]:bg-wash">
+        <label className="mt-3 flex cursor-pointer items-start gap-3 rounded-lg border border-rule bg-paper/40 px-3.5 py-3 has-[:checked]:border-accent/50 has-[:checked]:bg-wash">
           <input type="checkbox" name="hotOnly" defaultChecked={prefs.hotOnly} className="mt-1 h-4 w-4 accent-[var(--color-accent)]" />
           <span>
             <span className="font-semibold">Only top companies</span>
-            <span className="block text-sm text-muted">
-              FAANG+, top quant firms and AI labs, about 100 companies. Untick to hear about every new matching role, which can be dozens a day.
-            </span>
+            <span className="block text-sm text-muted">Big tech, top trading firms and AI labs. Turn this off to hear about every new role, which can be dozens a day.</span>
           </span>
         </label>
-        <div className="mt-4">
-          <label htmlFor="watch" className="mb-1.5 block text-[0.95rem] font-medium">
-            Always alert me about these companies too <span className="font-normal text-muted">(optional)</span>
-          </label>
-          <input id="watch" name="watch" defaultValue={prefs.watch.join(", ")} placeholder="Capital One, Duolingo, Jane Street" className={inputClass} />
-        </div>
+        <details className="group mt-3 rounded-lg border border-rule bg-paper/40 px-3.5 py-3" open={prefs.watch.length > 0}>
+          <summary className="cursor-pointer text-sm font-medium text-ink-soft marker:text-muted">More options</summary>
+          <div className="mt-3">
+            <label htmlFor="watch" className="mb-1.5 block text-sm text-ink-soft">
+              Also alert me about these companies, even if they aren&apos;t on the top list
+            </label>
+            <input id="watch" name="watch" defaultValue={prefs.watch.join(", ")} placeholder="For example: Capital One, Duolingo" className={inputClass} />
+          </div>
+        </details>
       </fieldset>
     </div>
   );
