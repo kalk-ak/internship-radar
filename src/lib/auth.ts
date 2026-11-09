@@ -8,7 +8,8 @@ const SESSION_DAYS = 14;
 function adminPassword() {
   const pw = process.env.ADMIN_PASSWORD;
   if (pw) return pw;
-  return process.env.VERCEL_ENV === "production" ? null : "admin";
+  // The "admin" fallback is for local development only, never on Vercel.
+  return process.env.VERCEL ? null : "admin";
 }
 
 export function adminConfigured() {
@@ -63,6 +64,6 @@ export async function rateLimit(bucket: string, limit: number, windowSeconds: nu
 
 export function cronAuthorized(authHeader: string | null) {
   const secret = process.env.CRON_SECRET;
-  if (!secret) return process.env.VERCEL_ENV !== "production";
+  if (!secret) return !process.env.VERCEL;
   return Boolean(authHeader) && safeEqual(authHeader!, `Bearer ${secret}`);
 }

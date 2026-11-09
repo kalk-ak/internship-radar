@@ -13,9 +13,7 @@ export function appUrl(): string {
 export function appSecret(): string {
   const secret = process.env.APP_SECRET;
   if (secret) return secret;
-  if (process.env.VERCEL_ENV === "production") {
-    throw new Error("APP_SECRET must be set in production");
-  }
+  if (process.env.VERCEL) throw new Error("APP_SECRET must be set on Vercel deployments");
   return "dev-only-insecure-secret";
 }
 

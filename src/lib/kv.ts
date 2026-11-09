@@ -222,7 +222,7 @@ export function kv(): KV {
   if (creds) {
     globalForKV.__kv = new UpstashKV(new Redis(creds));
   } else {
-    if (process.env.VERCEL_ENV === "production") {
+    if (process.env.VERCEL) {
       console.error("No Redis credentials found - falling back to in-memory storage (data will not persist).");
     }
     globalForKV.__kv = new MemoryKV();
