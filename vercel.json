@@ -1,0 +1,11 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "schedules": {
+    "check-simplify": {
+      "schedule": "*/15 * * * *",
+      "path": "/api/check",
+      "requestMethod": "POST",
+      "jitter": 15
+    }
+  }
+}

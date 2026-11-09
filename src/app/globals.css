@@ -1,0 +1,87 @@
+@import "tailwindcss";
+
+@theme {
+  --color-paper: #f3f5fa;
+  --color-panel: #ffffff;
+  --color-ink: #101935;
+  --color-ink-soft: #2b3557;
+  --color-muted: #5b6584;
+  --color-rule: #d8ddea;
+  --color-rule-strong: #b9c1d6;
+  --color-wash: #e8ecf5;
+
+  /* Freshness scale: posted < 1h, < 24h, older */
+  --color-hot: #f2421b;
+  --color-hot-text: #b92d0e;
+  --color-hot-wash: #fde8e2;
+  --color-warm: #e98a15;
+  --color-warm-text: #94540a;
+  --color-cool: #7c88aa;
+
+  --color-ok: #1d7a52;
+  --color-ok-wash: #e1f2e9;
+  --color-bad: #b42828;
+  --color-bad-wash: #fbe5e5;
+
+  --font-display: var(--font-anybody), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-hanken), ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.55;
+    background: var(--color-paper);
+  }
+  ::selection {
+    background: var(--color-hot-wash);
+    color: var(--color-ink);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
+}
+
+@utility font-wide {
+  font-family: var(--font-display);
+  font-variation-settings: "wdth" 125;
+}
+
+@utility font-narrow {
+  font-family: var(--font-display);
+  font-variation-settings: "wdth" 70;
+}
+
+/* The one moving thing on the page: the "listening" dot next to the last check time. */
+@keyframes ping-soft {
+  0% { transform: scale(1); opacity: 0.55; }
+  80%, 100% { transform: scale(2.6); opacity: 0; }
+}
+.live-dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: currentColor;
+  animation: ping-soft 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .live-dot::after { animation: none; }
+  html { scroll-behavior: auto; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}

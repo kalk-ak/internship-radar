@@ -1,0 +1,54 @@
+# Wakes the Vercel deployment every 5 minutes so it can check SimplifyJobs for
+# new internships. Vercel's free plan can't schedule anything more often than
+# every 15 minutes, so GitHub Actions (free and unlimited for public repos)
+# acts as the alarm clock. vercel.json keeps a 15-minute schedule as a backup.
+name: Check for new internships
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+    - cron: "17 4 * * 1" # weekly keep-alive, see the last step
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: check-internships
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Trigger a check
+        if: github.event.schedule != '17 4 * * 1'
+        env:
+          APP_URL: ${{ vars.APP_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$APP_URL" ] || [ -z "$CRON_SECRET" ]; then
+            echo "::warning::Set the APP_URL repository variable and the CRON_SECRET secret to enable checks."
+            exit 0
+          fi
+          status=$(curl -sS -o response.json -w '%{http_code}' --max-time 90 --retry 2 --retry-delay 5 \
+            -X POST -H "Authorization: Bearer $CRON_SECRET" -H "x-trigger: github-actions" \
+            "${APP_URL%/}/api/check" || echo "000")
+          echo "HTTP $status"
+          cat response.json 2>/dev/null || true
+          echo
+          # Report problems as annotations instead of failing, so a flaky
+          # upstream doesn't email you every 5 minutes. The admin page shows errors.
+          if [ "$status" != "200" ]; then
+            echo "::warning::Check returned HTTP $status"
+          fi
+
+      # GitHub disables scheduled workflows in public repos after 60 days
+      # without commits. Re-enabling the workflow through the API resets that.
+      - name: Keep the schedule alive
+        if: github.event.schedule == '17 4 * * 1'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X PUT "repos/${{ github.repository }}/actions/workflows/check.yml/enable"
